@@ -5,7 +5,7 @@
 #include "jsonparse.h"
 #include "hashmap.h"
 
-#define DEBUG 0
+#define DEBUG 1
 #if DEBUG
 #define PRINTF(...) printf(__VA_ARGS__)
 #else
@@ -97,15 +97,15 @@ int JSONModelLoader_AddObjectReference(JSONModelLoader *const this, ObjectRefere
 int resolveReferences(any_t root, any_t objRef)
 {
 	ContainerRoot *model = (ContainerRoot*)root;
-	char *srcObj;
+	char *srcObj = NULL;
 	char srcId[50];
-	char *srcObjId;
-	char *refObj;
+	char *srcObjId = NULL;
+	char *refObj = NULL;
 	char refId[50];
-	char *refObjId;
-	char *srcObj2;
+	char *refObjId = NULL;
+	char *srcObj2 = NULL;
 	char srcId2[50];
-	char *srcObjId2;
+	char *srcObjId2 = NULL;
 
 	if(objRef != NULL && model != NULL)
 	{
@@ -121,38 +121,54 @@ int resolveReferences(any_t root, any_t objRef)
 		sscanf(refObj, "%*[^[][%[^]]", refId);
 		PRINTF("refId: %s\n", refId);
 
-		srcObjId = strtok(srcObj, "[");
+		srcObjId = strdup(strtok(srcObj, "["));
 		PRINTF("srcObjId: %s\n", srcObjId);
-		refObjId = strtok(refObj, "[");
+		refObjId = strdup(strtok(refObj, "["));
 		PRINTF("refObjId: %s\n", refObjId);
+
+		free(refObj);
 
 		if(!strcmp(srcObjId, "nodes"))
 		{
+			free(srcObj);
+			srcObj = strdup(obj->srcObjectId);
 			srcObj2 = strtok(srcObj, "/");
-			srcObj2 = strtok(NULL, "/");
+			srcObj2 = strdup(strtok(NULL, "/"));
 			PRINTF("srcObj2: %s\n", srcObj2);
+			free(srcObj);
 
 			if(srcObj2 != NULL)
 			{
 				sscanf(srcObj2, "%*[^[][%[^]]", srcId2);
 				PRINTF("srcId2: %s\n", srcId2);
 
-				srcObjId2 = strtok(srcObj2, "[");
+				srcObjId2 = strdup(strtok(srcObj2, "["));
 				PRINTF("srcObjId2: %s\n", srcObjId2);
+				free(srcObj2);
 			}
 			else
 			{
 				PRINTF("There is no srcObj2!\n");
 				memset(&srcId2[0], 0, sizeof(srcId2));
 				srcObjId2 = NULL;
+				free(srcObj);
 			}
+			obj->delete(obj);
 
+		}
+		else
+		{
+			obj->delete(obj);
+			free(srcObj);
 		}
 
 		if(!strcmp(srcObjId, "nodes"))
 		{
+			free(srcObjId);
+			PRINTF("Resolving for nodes!\n");
 			if(!strcmp(refObjId, "groups"))
 			{
+				free(refObjId);
 				Group *grp = model->FindGroupsByID(model, refId);
 				ContainerNode *node = model->FindNodesByID(model, srcId);
 				if(grp != NULL && node != NULL)
@@ -166,42 +182,52 @@ int resolveReferences(any_t root, any_t objRef)
 					PRINTF("Cannot add group reference to node!\n");
 				}
 			}
-			else if(!strcmp(refObjId, "typeDefinitions") && strcmp(srcObjId2, "components"))
+			else if(!strcmp(refObjId, "typeDefinitions"))
 			{
-				TypeDefinition *typdef = model->FindTypeDefsByID(model, refId);
-				ContainerNode *node = model->FindNodesByID(model, srcId);
-				if(typdef != NULL && node != NULL)
+				free(refObjId);
+				if(strcmp(srcObjId2, "components"))
 				{
-					PRINTF("Adding typeDefinition %s to node %s\n", typdef->InternalGetKey(typdef), node->InternalGetKey(node));
-					node->super->AddTypeDefinition(node->super, typdef);
-					return MAP_OK;
+					free(srcObjId2);
+					PRINTF("Resolving for typeDefinitions in nodes!\n");
+					TypeDefinition *typdef = model->FindTypeDefsByID(model, refId);
+					ContainerNode *node = model->FindNodesByID(model, srcId);
+					if(typdef != NULL && node != NULL)
+					{
+						PRINTF("Adding typeDefinition %s to node %s\n", typdef->InternalGetKey(typdef), node->InternalGetKey(node));
+						node->super->AddTypeDefinition(node->super, typdef);
+						return MAP_OK;
+					}
+					else
+					{
+						PRINTF("Cannot add typeDefinitions reference to node!\n");
+					}
 				}
-				else
+				else if(!strcmp(srcObjId2, "components"))
 				{
-					PRINTF("Cannot add typeDefinitions reference to node!\n");
-				}
-			}
-			else if(!strcmp(refObjId, "typeDefinitions") && !strcmp(srcObjId2, "components"))
-			{
-				TypeDefinition *typdef = model->FindTypeDefsByID(model, refId);
-				ContainerNode *node = model->FindNodesByID(model, srcId);
-				ComponentInstance *comp = node->FindComponentsByID(node, srcId2);
-				if(typdef != NULL && node != NULL && comp != NULL)
-				{
-					PRINTF("Adding typeDefinition %s to component %s\n", typdef->InternalGetKey(typdef), comp->InternalGetKey(comp));
-					comp->super->AddTypeDefinition(comp->super, typdef);
-					return MAP_OK;
-				}
-				else
-				{
-					PRINTF("Cannot add typeDefinitions reference to node!\n");
+					free(srcObjId2);
+					PRINTF("Resolving for typeDefinitions in components!\n");
+					TypeDefinition *typdef = model->FindTypeDefsByID(model, refId);
+					ContainerNode *node = model->FindNodesByID(model, srcId);
+					ComponentInstance *comp = node->FindComponentsByID(node, srcId2);
+					if(typdef != NULL && node != NULL && comp != NULL)
+					{
+						PRINTF("Adding typeDefinition %s to component %s\n", typdef->InternalGetKey(typdef), comp->InternalGetKey(comp));
+						comp->super->AddTypeDefinition(comp->super, typdef);
+						return MAP_OK;
+					}
+					else
+					{
+						PRINTF("Cannot add typeDefinitions reference to node!\n");
+					}
 				}
 			}
 		}
 		else if(!strcmp(srcObjId, "typeDefinitions"))
 		{
+			free(srcObjId);
 			if(!strcmp(refObjId, "deployUnits"))
 			{
+				free(refObjId);
 				DeployUnit *du = model->FindDeployUnitsByID(model, refId);
 				TypeDefinition *typdef = model->FindTypeDefsByID(model, srcId);
 				if(du != NULL && typdef != NULL)
@@ -218,8 +244,10 @@ int resolveReferences(any_t root, any_t objRef)
 		}
 		else if(!strcmp(srcObjId, "libraries"))
 		{
+			free(srcObjId);
 			if(!strcmp(refObjId, "typeDefinitions"))
 			{
+				free(refObjId);
 				TypeDefinition *typdef = model->FindTypeDefsByID(model, refId);
 				TypeLibrary *typlib = model->FindLibrariesByID(model, srcId);
 				if(typdef != NULL && typlib != NULL)
@@ -236,8 +264,10 @@ int resolveReferences(any_t root, any_t objRef)
 		}
 		else if(!strcmp(srcObjId, "groups"))
 		{
+			free(srcObjId);
 			if(!strcmp(refObjId, "nodes"))
 			{
+				free(refObjId);
 				ContainerNode *node = model->FindNodesByID(model, refId);
 				Group *group = model->FindGroupsByID(model, srcId);
 				if(node != NULL && group != NULL)
@@ -253,6 +283,7 @@ int resolveReferences(any_t root, any_t objRef)
 			}
 			else if(!strcmp(refObjId, "typeDefinitions"))
 			{
+				free(refObjId);
 				TypeDefinition *typdef = model->FindTypeDefsByID(model, refId);
 				Group *group = model->FindGroupsByID(model, srcId);
 				if(typdef != NULL && group != NULL)
@@ -268,6 +299,9 @@ int resolveReferences(any_t root, any_t objRef)
 		}
 		else
 		{
+			free(srcObjId2);
+			free(refObjId);
+			free(srcObjId);
 			PRINTF("Source not found!\n");
 			return MAP_MISSING;
 		}
@@ -743,8 +777,16 @@ ContainerRoot *JSONKevDeserializer(struct jsonparse_state *jsonState, char _json
 	if(loader->objects != NULL)
 	{
 		PRINTF("Resolving dependencies...\n");
-		hashmap_iterate(loader->objects, resolveReferences, new_model);
-		return new_model;
+		if(hashmap_iterate(loader->objects, resolveReferences, new_model) == MAP_OK)
+		{
+			loader->delete(loader);
+			return new_model;
+		}
+		else
+		{
+			loader->delete(loader);
+			return NULL;
+		}
 	}
 	else
 	{
