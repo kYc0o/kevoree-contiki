@@ -4,7 +4,7 @@
 #include "json.h"
 #include "jsonparse.h"
 
-#define DEBUG 0
+#define DEBUG 1
 #if DEBUG
 #define PRINTF(...) printf(__VA_ARGS__)
 #else
@@ -180,8 +180,8 @@ ContainerNode *createContainerNode(struct jsonparse_state *jsonState, char jsonT
 						PRINTF("\t\t\t]\n");
 						break;
 					}
+					break;
 				}
-				break;
 			}
 			else if(!strcmp(strJson, "host"))
 			{
@@ -223,8 +223,8 @@ ContainerNode *createContainerNode(struct jsonparse_state *jsonState, char jsonT
 						PRINTF("\t\t\t]\n");
 						break;
 					}
+					break;
 				}
-				break;
 			}
 			else if(!strcmp(strJson, "groups"))
 			{
@@ -287,8 +287,8 @@ ContainerNode *createContainerNode(struct jsonparse_state *jsonState, char jsonT
 						PRINTF("\t\t\t]\n");
 						break;
 					}
+					break;
 				}
-				break;
 			}
 			else if(!strcmp(strJson, "networkInformation"))
 			{
@@ -426,24 +426,52 @@ ContainerNode *createContainerNode(struct jsonparse_state *jsonState, char jsonT
 						{
 							switch(jsonType)
 							{
-							/*case JSON_TYPE_OBJECT:
-											JSONKevDeserializer(jsonState, jsonType, NULL);
-											break;*/
-
-							case JSON_TYPE_STRING:
-								jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
-								PRINTF("\t\t\t\t%s\n", strJson);
+							case JSON_TYPE_OBJECT:
+								PRINTF("JSON_TYPE_OBJECT\n\t{\n");
+								switch(jsonparse_next(jsonState))
+								{
+								case JSON_TYPE_PAIR_NAME:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("JSON_TYPE_PAIR_NAME\n%s\n", strJson);
+									if(!strcmp(strJson, "eClass"))
+									{
+										switch(jsonparse_next(jsonState))
+										{
+										case JSON_TYPE_PAIR:
+											jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+											PRINTF("JSON_TYPE_PAIR\n\t\t\t%s : ", strJson);
+											switch(jsonparse_next(jsonState))
+											{
+											case JSON_TYPE_STRING:
+												jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+												if(!strcmp(strJson, "org.kevoree.Dictionary"))
+												{
+													Dictionary *dic = createDictionary(jsonState, jsonType, strJson);
+													obj->super->AddDictionary(obj->super, dic);
+												}
+												break;
+											}
+											break;
+										}
+									}
+									break;
+								}
 								break;
 
-							case JSON_TYPE_INT:
-								jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
-								PRINTF("\t\t\t\t%s\n", strJson);
-								break;
+								case JSON_TYPE_STRING:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("\t\t\t\t%s\n", strJson);
+									break;
 
-							case JSON_TYPE_NUMBER:
-								jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
-								PRINTF("\t\t\t\t%s\n", strJson);
-								break;
+								case JSON_TYPE_INT:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("\t\t\t\t%s\n", strJson);
+									break;
+
+								case JSON_TYPE_NUMBER:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("\t\t\t\t%s\n", strJson);
+									break;
 							}
 						}
 						PRINTF("\t\t\t]\n");
@@ -820,24 +848,52 @@ ComponentInstance * createComponentInstance(struct jsonparse_state *jsonState, c
 						{
 							switch(jsonType)
 							{
-							/*case JSON_TYPE_OBJECT:
-														JSONKevDeserializer(jsonState, jsonType, NULL);
-														break;*/
-
-							case JSON_TYPE_STRING:
-								jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
-								PRINTF("\t\t\t\t%s\n", strJson);
+							case JSON_TYPE_OBJECT:
+								PRINTF("JSON_TYPE_OBJECT\n\t{\n");
+								switch(jsonparse_next(jsonState))
+								{
+								case JSON_TYPE_PAIR_NAME:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("JSON_TYPE_PAIR_NAME\n%s\n", strJson);
+									if(!strcmp(strJson, "eClass"))
+									{
+										switch(jsonparse_next(jsonState))
+										{
+										case JSON_TYPE_PAIR:
+											jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+											PRINTF("JSON_TYPE_PAIR\n\t\t\t%s : ", strJson);
+											switch(jsonparse_next(jsonState))
+											{
+											case JSON_TYPE_STRING:
+												jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+												if(!strcmp(strJson, "org.kevoree.Dictionary"))
+												{
+													Dictionary *dic = createDictionary(jsonState, jsonType, strJson);
+													obj->super->AddDictionary(obj->super, dic);
+												}
+												break;
+											}
+											break;
+										}
+									}
+									break;
+								}
 								break;
 
-							case JSON_TYPE_INT:
-								jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
-								PRINTF("\t\t\t\t%s\n", strJson);
-								break;
+								case JSON_TYPE_STRING:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("\t\t\t\t%s\n", strJson);
+									break;
 
-							case JSON_TYPE_NUMBER:
-								jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
-								PRINTF("\t\t\t\t%s\n", strJson);
-								break;
+								case JSON_TYPE_INT:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("\t\t\t\t%s\n", strJson);
+									break;
+
+								case JSON_TYPE_NUMBER:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("\t\t\t\t%s\n", strJson);
+									break;
 							}
 						}
 						PRINTF("\t\t\t]\n");
@@ -984,6 +1040,100 @@ ComponentInstance * createComponentInstance(struct jsonparse_state *jsonState, c
 							case JSON_TYPE_NUMBER:
 								jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 								PRINTF("\t\t\t\t%s\n", strJson);
+								break;
+							}
+						}
+						PRINTF("\t\t\t]\n");
+						break;
+					}
+					break;
+				}
+			}
+			break;
+		}
+	}
+	PRINTF("\t}\n");
+	return obj;
+}
+
+Dictionary *createDictionary(struct jsonparse_state *jsonState, char jsonType, char *strJson)
+{
+	PRINTF("%s\n", strJson);
+
+	Dictionary *obj = new_Dictionary();
+
+	while((jsonType = jsonparse_next(jsonState)) != '}')
+	{
+		switch(jsonType)
+		{
+		case JSON_TYPE_PAIR_NAME:
+			jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+			PRINTF("JSON_TYPE_PAIR_NAME\n%s\n", strJson);
+			if(!strcmp(strJson, "generated_KMF_ID"))
+			{
+				switch(jsonparse_next(jsonState))
+				{
+				case JSON_TYPE_PAIR:
+					jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+					PRINTF("JSON_TYPE_PAIR\n\t\t\t%s : ", strJson);
+					switch(jsonparse_next(jsonState))
+					{
+					case JSON_TYPE_STRING:
+						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+						strcpy(obj->generated_KMF_ID, strJson);
+						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->generated_KMF_ID);
+						break;
+					}
+					break;
+				}
+			}
+			else if(!strcmp(strJson, "values"))
+			{
+				switch(jsonparse_next(jsonState))
+				{
+				case JSON_TYPE_PAIR:
+					jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+					PRINTF("JSON_TYPE_PAIR\n\t\t\t%s : ", strJson);
+					switch(jsonparse_next(jsonState))
+					{
+					case JSON_TYPE_ARRAY:
+						/*jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);*/
+						PRINTF("[\n");
+						while((jsonType = jsonparse_next(jsonState)) != ']')
+						{
+							switch(jsonType)
+							{
+							case JSON_TYPE_OBJECT:
+								PRINTF("JSON_TYPE_OBJECT\n\t{\n");
+								switch(jsonparse_next(jsonState))
+								{
+								case JSON_TYPE_PAIR_NAME:
+									jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+									PRINTF("JSON_TYPE_PAIR_NAME\n%s\n", strJson);
+									if(!strcmp(strJson, "eClass"))
+									{
+										switch(jsonparse_next(jsonState))
+										{
+										case JSON_TYPE_PAIR:
+											jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+											PRINTF("JSON_TYPE_PAIR\n\t\t\t%s : ", strJson);
+											switch(jsonparse_next(jsonState))
+											{
+											case JSON_TYPE_STRING:
+												jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
+												if(!strcmp(strJson, "org.kevoree.DictionaryType"))
+												{
+													DictionaryType *dictype = createDictionaryType(jsonState, jsonType, strJson);
+													obj->AddValues(obj, dictype);
+												}
+												break;
+											}
+											break;
+										}
+									}
+									break;
+								}
 								break;
 							}
 						}

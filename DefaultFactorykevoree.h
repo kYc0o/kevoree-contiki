@@ -20,6 +20,7 @@ typedef struct _TypeLibrary TypeLibrary;
 typedef struct _FragmentDictionary FragmentDictionary;
 typedef struct _DictionaryValue DictionaryValue;
 typedef struct _JSONModelLoader JSONModelLoader;
+typedef struct _Dictionary Dictionary;
 
 ContainerRoot *createContainerRoot(struct jsonparse_state *jsonState, char jsonType, char *strJson);
 ContainerNode *createContainerNode(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, JSONModelLoader *loader);
@@ -35,4 +36,5 @@ DictionaryAttribute *createDictionaryAttribute(struct jsonparse_state *jsonState
 TypeLibrary *createTypeLibrary(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, JSONModelLoader *loader);
 FragmentDictionary *createFragmentDictionary(struct jsonparse_state *jsonState, char jsonType, char *strJson);
 DictionaryValue *createDictionaryValue(struct jsonparse_state *jsonState, char jsonType, char *strJson);
+Dictionary *createDictionary(struct jsonparse_state *jsonState, char jsonType, char *strJson);
 #endif
