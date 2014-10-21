@@ -19,7 +19,7 @@ typedef void* (*fptrFindByPathDictionary)(char*, Dictionary*);
 
 typedef struct _Dictionary {
 	void *pDerivedObj;
-	char generated_KMF_ID[9];
+	char generated_KMF_ID[33];
 	map_t values;
 	char *eContainer;
 	fptrDicoFindValuesByID FindValuesByID;
