@@ -1081,7 +1081,6 @@ Dictionary *createDictionary(struct jsonparse_state *jsonState, char jsonType, c
 					case JSON_TYPE_STRING:
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						strcpy(obj->generated_KMF_ID, strJson);
-						PRINTF("%s\n", strJson);
 						PRINTF("%s -> %s\n", strJson, obj->generated_KMF_ID);
 						break;
 					}
@@ -1195,7 +1194,7 @@ Group * createGroup(struct jsonparse_state *jsonState, char jsonType, char *strJ
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->super->metaData = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->super->metaData, strJson);
-						PRINTF("%s -> %s\n", strJson, obj->super->super->name);
+						PRINTF("%s -> %s\n", strJson, obj->super->metaData);
 						break;
 					}
 					break;
@@ -1495,7 +1494,7 @@ FragmentDictionary *createFragmentDictionary(struct jsonparse_state *jsonState, 
 					case JSON_TYPE_STRING:
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						strcpy(obj->super->generated_KMF_ID, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->super->generated_KMF_ID);
 						break;
 					}
 					break;
@@ -1514,7 +1513,7 @@ FragmentDictionary *createFragmentDictionary(struct jsonparse_state *jsonState, 
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->name = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->name, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->name);
 						break;
 					}
 					break;
@@ -1615,7 +1614,7 @@ DictionaryValue *createDictionaryValue(struct jsonparse_state *jsonState, char j
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->name = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->name, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->name);
 						break;
 					}
 					break;
@@ -1634,7 +1633,7 @@ DictionaryValue *createDictionaryValue(struct jsonparse_state *jsonState, char j
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->value = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->value, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->value);
 						break;
 					}
 					break;
@@ -1919,7 +1918,10 @@ TypeDefinition* createTypeDefinition(struct jsonparse_state *jsonState, char jso
 												if(!strcmp(strJson, "org.kevoree.DictionaryType"))
 												{
 													DictionaryType *dictype = createDictionaryType(jsonState, jsonType, strJson);
-													obj->AddDictionaryType(obj, dictype);
+													if(dictype != NULL)
+														obj->AddDictionaryType(obj, dictype);
+													else
+														return NULL;
 												}
 												break;
 											}
@@ -2034,8 +2036,12 @@ DictionaryType *createDictionaryType(struct jsonparse_state *jsonState, char jso
 
 	DictionaryType *obj = new_DictionaryType();
 
+	if(obj == NULL)
+		return NULL;
+
 	while((jsonType = jsonparse_next(jsonState)) != '}')
 	{
+		PRINTF("jsonType: %c\n", jsonType);
 		switch(jsonType)
 		{
 		case JSON_TYPE_PAIR_NAME:
@@ -2053,7 +2059,7 @@ DictionaryType *createDictionaryType(struct jsonparse_state *jsonState, char jso
 					case JSON_TYPE_STRING:
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						strcpy(obj->generated_KMF_ID, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->generated_KMF_ID);
 						break;
 					}
 					break;
@@ -2147,7 +2153,7 @@ DictionaryAttribute *createDictionaryAttribute(struct jsonparse_state *jsonState
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->super->super->name = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->super->super->name, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->super->super->name);
 						break;
 					}
 					break;
@@ -2165,7 +2171,7 @@ DictionaryAttribute *createDictionaryAttribute(struct jsonparse_state *jsonState
 					case JSON_TYPE_STRING:
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->optional = atoi(strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %d\n", strJson, obj->optional);
 						break;
 					}
 					break;
@@ -2183,7 +2189,7 @@ DictionaryAttribute *createDictionaryAttribute(struct jsonparse_state *jsonState
 					case JSON_TYPE_STRING:
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->state = atoi(strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %d\n", strJson, obj->state);
 						break;
 					}
 					break;
@@ -2202,7 +2208,7 @@ DictionaryAttribute *createDictionaryAttribute(struct jsonparse_state *jsonState
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->datatype = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->datatype, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->datatype);
 						break;
 					}
 					break;
@@ -2220,13 +2226,13 @@ DictionaryAttribute *createDictionaryAttribute(struct jsonparse_state *jsonState
 					case JSON_TYPE_STRING:
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->fragmentDependant = atoi(strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %d\n", strJson, obj->fragmentDependant);
 						break;
 					}
 					break;
 				}
 			}
-			else if(!strcmp(strJson, "datatype"))
+			else if(!strcmp(strJson, "defaultValue"))
 			{
 				switch(jsonparse_next(jsonState))
 				{
@@ -2239,7 +2245,7 @@ DictionaryAttribute *createDictionaryAttribute(struct jsonparse_state *jsonState
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->defaultValue = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->defaultValue, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->defaultValue);
 						break;
 					}
 					break;
@@ -2295,7 +2301,7 @@ TypeLibrary *createTypeLibrary(struct jsonparse_state *jsonState, char jsonType,
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->super->name = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->super->name, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->super->name);
 						break;
 					}
 					break;
@@ -2417,7 +2423,7 @@ DeployUnit * createDeployUnit(struct jsonparse_state *jsonState, char jsonType, 
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->super->name = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->super->name, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->super->name);
 						break;
 					}
 					break;
@@ -2436,7 +2442,7 @@ DeployUnit * createDeployUnit(struct jsonparse_state *jsonState, char jsonType, 
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->groupName = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->groupName, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->super->name);
 						break;
 					}
 					break;
@@ -2456,7 +2462,7 @@ DeployUnit * createDeployUnit(struct jsonparse_state *jsonState, char jsonType, 
 						/*obj->state = atoi(strJson);*/
 						obj->version = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->version, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->version);
 						break;
 					}
 					break;
@@ -2475,7 +2481,7 @@ DeployUnit * createDeployUnit(struct jsonparse_state *jsonState, char jsonType, 
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->url = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->url, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->url);
 						break;
 					}
 					break;
@@ -2494,7 +2500,7 @@ DeployUnit * createDeployUnit(struct jsonparse_state *jsonState, char jsonType, 
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->hashcode = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->hashcode, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->hashcode);
 						break;
 					}
 					break;
@@ -2513,7 +2519,7 @@ DeployUnit * createDeployUnit(struct jsonparse_state *jsonState, char jsonType, 
 						jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 						obj->type = malloc(sizeof(char) * strlen(strJson) + 1);
 						strcpy(obj->type, strJson);
-						PRINTF("%s\n", strJson);
+						PRINTF("%s -> %s\n", strJson, obj->type);
 						break;
 					}
 					break;
