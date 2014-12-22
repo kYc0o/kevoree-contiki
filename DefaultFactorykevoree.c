@@ -11,6 +11,25 @@
 #define PRINTF(...)
 #endif
 
+/*KMFFactory *new_KMFFactory()
+{
+	KMFFactory *pKMFFactoryObj = NULL;
+
+	pKMFFactoryObj = (ContainerRoot*)malloc(sizeof(KMFFactory));
+
+	if(pKMFFactoryObj == NULL)
+	{
+		return NULL;
+	}
+
+	pKMFFactoryObj->createContainerNode = createContainerNode;
+	pKMFFactoryObj->createComponentInstance = createComponentInstance;
+	pKMFFactoryObj->createGroup = createGroup;
+	pKMFFactoryObj->createTypeDefinition = createTypeDefinition;
+
+
+}*/
+
 ContainerNode *createContainerNode(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, JSONModelLoader *loader)
 {
 	PRINTF("%s\n", strJson);
@@ -700,7 +719,7 @@ NetworkProperty *createNetworkProperty(struct jsonparse_state *jsonState, char j
 	return obj;
 }
 
-ComponentInstance * createComponentInstance(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, ContainerNode *node, JSONModelLoader *loader)
+ComponentInstance *createComponentInstance(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, ContainerNode *node, JSONModelLoader *loader)
 {
 	PRINTF("%s\n", strJson);
 
@@ -1149,7 +1168,7 @@ Dictionary *createDictionary(struct jsonparse_state *jsonState, char jsonType, c
 	return obj;
 }
 
-Group * createGroup(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, JSONModelLoader *loader)
+Group *createGroup(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, JSONModelLoader *loader)
 {
 	PRINTF("%s\n", strJson);
 
@@ -1646,7 +1665,7 @@ DictionaryValue *createDictionaryValue(struct jsonparse_state *jsonState, char j
 	return obj;
 }
 
-TypeDefinition* createTypeDefinition(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, JSONModelLoader *loader)
+TypeDefinition *createTypeDefinition(struct jsonparse_state *jsonState, char jsonType, char *strJson, ContainerRoot *root, JSONModelLoader *loader)
 {
 	PRINTF("%s\n", strJson);
 

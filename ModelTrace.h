@@ -24,12 +24,13 @@
   string refName;
 };*/
 
-/*typedef struct _ModelTrace ModelTrace;*/
+typedef struct _ModelTrace ModelTrace;
 
 typedef char* (*fptrModelTraceToString)(void*);
 typedef void (*fptrDeleteModelTrace)(void*);
 
 typedef struct _ModelTrace {
+	ModelTrace *next;
 	void* pDerivedObj;
 	char* srcPath;
 	char* refName;
