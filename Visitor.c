@@ -14,6 +14,8 @@ Visitor *new_Visitor(ContainerRoot *new_model, ContainerRoot *current_model)
 
 	pVisitObj->new_model = new_model;
 	pVisitObj->current_model = current_model;
+	pVisitObj->visit_list_list = NULL;
+	pVisitObj->visit_list = (list_t)&(pVisitObj->visit_list_list);
 	list_init(pVisitObj->visit_list);
 
 	pVisitObj->store = Visitor_store;

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "KMF4C.h"
+#include "lib/list.h"
 /*#include "ModelAttributeVisitor.h"
 #include "ModelVisitor.h"*/
 /*#include "ContainerRoot.h"*/
@@ -36,6 +37,8 @@ enum Type
 typedef struct _Visitor {
 	ContainerRoot *new_model;
 	ContainerRoot *current_model;
+	/*LIST(visit_list);*/
+	void *visit_list_list;
 	list_t visit_list;
 	fptrVisit store;
 	fptrVisit printPaths;
