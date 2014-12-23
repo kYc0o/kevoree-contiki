@@ -25,7 +25,9 @@ typedef void (*fptrAppend)(TraceSequence*, TraceSequence*);
 typedef char *(*fptrTracesToString)(TraceSequence*);
 
 typedef struct _TraceSequence {
-	LIST(traces_list);
+	/*LIST(traces_list);*/
+	void *traces_list_list;
+	list_t traces_list;
 	fptrAppend append;
 	fptrPopulate populate;
 	fptrTracesToString toString;

@@ -25,6 +25,8 @@ ModelTrace* new_ModelTrace()
 	
 	pObj->ToString = ModelTrace_ToString;
 	pObj->Delete = delete_ModelTrace;
+
+	return pObj;
 }
 
 void delete_ModelTrace(void* const this)
@@ -39,7 +41,7 @@ void delete_ModelTrace(void* const this)
 
 char* ModelTrace_ToString(void* const this)
 {
-  
+	return NULL;
 }
 
 /*ModelSetTrace::ModelSetTrace (string _srcPath, string _refName, string _objPath, string _content, string _typeName)
@@ -166,7 +168,7 @@ char *ModelSetTrace_ToString(void* const this)
 		/*buffer.append (", \"objpath\" : \"" + objPath + "\"");*/
 		buffer = realloc(buffer, strlen(buffer) +
 				strlen(", \"objpath\" : \"\"") +
-				strlen(((ModelSetTrace*)this)->objPath)));
+				strlen(((ModelSetTrace*)this)->objPath));
 		sprintf(buffer, "%s, \"objpath\" : \"%s\"", buffer, ((ModelSetTrace*)this)->objPath);
 	}
 	/*if (!content.empty ())*/
@@ -184,7 +186,7 @@ char *ModelSetTrace_ToString(void* const this)
 		/*buffer.append (", \"typename\" : \"" + typeName + "\"");*/
 		buffer = realloc(buffer, strlen(buffer) +
 				strlen(", \"typename\" : \"\"") +
-				strlen(((ModelSetTrace*)this)->typeName)));
+				strlen(((ModelSetTrace*)this)->typeName));
 		sprintf(buffer, "%s, \"typename\" : \"%s\"", buffer, ((ModelSetTrace*)this)->typeName);
 	}
 	

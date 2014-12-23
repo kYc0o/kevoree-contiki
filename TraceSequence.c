@@ -2,8 +2,8 @@
 
 /*#include <map>
 #include <list>*/
-#include "dev/list.h"
-#include "stdbool.h"
+#include "lib/list.h"
+#include <stdbool.h>
 #include "ModelTrace.h"
 /*#include <sstream>
 #include <microframework/api/json/Lexer.h>
@@ -27,6 +27,8 @@ TraceSequence *new_TraceSequence()
 	}
 
 	/*pTraceSeqObj->traces_list = NULL;*/
+	pTraceSeqObj->traces_list_list = NULL;
+	pTraceSeqObj->traces_list = (list_t)&(pTraceSeqObj->traces_list_list);
 	list_init(pTraceSeqObj->traces_list);
 	pTraceSeqObj->append = TraceSequence_append;
 	pTraceSeqObj->populate = TraceSequence_populate;
@@ -87,6 +89,7 @@ char *TraceSequence_toString(TraceSequence *const this)
 	char *sequences;
 	/*memset(&sequences[0], 0, sizeof(sequences));*/
 	bool isFirst = true;
+	int i;
 
 	ModelTrace *mt;
 
