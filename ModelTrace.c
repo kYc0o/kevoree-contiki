@@ -6,6 +6,13 @@
  * Time: 17:55
  */
 
+#define DEBUG 1
+#if DEBUG
+#define PRINTF(...) printf(__VA_ARGS__)
+#else
+#define PRINTF(...)
+#endif
+
 ModelTrace* new_ModelTrace()
 {
 	ModelTrace* pObj = NULL;
@@ -68,9 +75,11 @@ ModelTrace* newPoly_ModelSetTrace(char* _srcPath, char* _refName, char* _objPath
 	}
 
 	pObj->pDerivedObj = pModSetTraceObj; /* Pointing to derived object */
+	pModSetTraceObj->super = pObj;
 	
 	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
+	PRINTF("\nsrcPath: %s\n", pObj->srcPath);
 	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
 	pModSetTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
@@ -219,6 +228,7 @@ ModelTrace* newPoly_ModelAddTrace(char* _srcPath, char* _refName, char* _previou
 	}
 
 	pObj->pDerivedObj = pModAddTraceObj; /* Pointing to derived object */
+	pModAddTraceObj->super = pObj;
 	
 	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
@@ -405,6 +415,7 @@ ModelTrace *newPoly_ModelRemoveTrace(char* _srcPath, char* _refName, char* _objP
 	}
 
 	pObj->pDerivedObj = pModRemTraceObj; /* Pointing to derived object */
+	pModRemTraceObj->super = pObj;
 	
 	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);

@@ -17,6 +17,13 @@ using std::list;*/
  * Time: 18:36
  */
 
+#define DEBUG 1
+#if DEBUG
+#define PRINTF(...) printf(__VA_ARGS__)
+#else
+#define PRINTF(...)
+#endif
+
 TraceSequence *new_TraceSequence()
 {
 	TraceSequence *pTraceSeqObj = (TraceSequence*)malloc(sizeof(TraceSequence));
@@ -35,8 +42,9 @@ TraceSequence *new_TraceSequence()
 	pTraceSeqObj->toString = TraceSequence_toString;
 	pTraceSeqObj->delete = delete_TraceSequence;
 
-	return pTraceSeqObj;
+	PRINTF("TraceSequence created at: %p \n", pTraceSeqObj);
 
+	return pTraceSeqObj;
 }
 
 void delete_TraceSequence(void *const this)
@@ -82,6 +90,10 @@ TraceSequence *TraceSequence_populate(TraceSequence *const this, list_t addTrace
 		void *temp = list_pop(addTraces);
 		list_add(this->traces_list, temp);
 	}
+
+	PRINTF("TraceSequence populated!\n");
+
+	return this;
 }
 
 char *TraceSequence_toString(TraceSequence *const this)
@@ -93,6 +105,8 @@ char *TraceSequence_toString(TraceSequence *const this)
 
 	ModelTrace *mt;
 
+	PRINTF("Creating string traces!\n");
+
 	sequences = malloc(strlen("[]"));
 	sprintf(sequences, "[");
 
@@ -102,11 +116,13 @@ char *TraceSequence_toString(TraceSequence *const this)
 			sequences = realloc(sequences, strlen(sequences) +
 								strlen(",") +
 								strlen(mt->ToString(mt)) + 1);
+			PRINTF("%s,%s", sequences, mt->ToString(mt));
 			sprintf(sequences, "%s,%s", sequences, mt->ToString(mt));
 		}
 		else
 		{
 			mt = list_head(this->traces_list);
+			PRINTF("%s%s", sequences, mt->ToString(mt));
 			sprintf(sequences, "%s%s", sequences, mt->ToString(mt));
 			isFirst = false;
 		}
