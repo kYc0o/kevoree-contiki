@@ -28,6 +28,7 @@ typedef void* (*fptrFindByPathInstance)(char*, Instance*);
 typedef struct _Instance {
 	NamedElement* super;
 	void* pDerivedObj;
+	char *path;
 	char* metaData;
 	bool started;
 	TypeDefinition* typeDefinition;

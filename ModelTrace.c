@@ -1,4 +1,5 @@
 #include "ModelTrace.h"
+#include "ActionType.h"
 
 /**
  * Author: fco.ja.ac@gmail.com
@@ -6,12 +7,16 @@
  * Time: 17:55
  */
 
-#define DEBUG 1
+#define DEBUG 0
 #if DEBUG
 #define PRINTF(...) printf(__VA_ARGS__)
 #else
 #define PRINTF(...)
 #endif
+
+#define TRACE_BUF_SIZE 400
+#define PATH_OK  1
+#define PATH_ERROR -1
 
 ModelTrace* new_ModelTrace()
 {
@@ -60,7 +65,7 @@ char* ModelTrace_ToString(void* const this)
 	typeName = _typeName;
 }*/
 
-ModelTrace* newPoly_ModelSetTrace(char* _srcPath, char* _refName, char* _objPath, char* _content, char* _typeName)
+ModelTrace* newPoly_ModelSetTrace(char* _srcPath, char* _refName, /*char* _objPath,*/ char* _content/*, char* _typeName*/)
 {
 	ModelSetTrace* pModSetTraceObj = NULL;
 	ModelTrace* pObj = new_ModelTrace();
@@ -79,15 +84,19 @@ ModelTrace* newPoly_ModelSetTrace(char* _srcPath, char* _refName, char* _objPath
 	
 	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
-	PRINTF("\nsrcPath: %s\n", pObj->srcPath);
+	PRINTF("\nsrcPath: %s\n", pModSetTraceObj->super->srcPath);
 	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
-	pModSetTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
+	PRINTF("\nrefName: %s\n", pModSetTraceObj->super->refName);
+	/*pModSetTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
 	strcpy(pModSetTraceObj->objPath, _objPath);
+	PRINTF("\nobjPath: %s\n", pModSetTraceObj->objPath);*/
 	pModSetTraceObj->content = my_malloc(sizeof(char)*(strlen(_content)+1));
 	strcpy(pModSetTraceObj->content, _content);
-	pModSetTraceObj->typeName = my_malloc(sizeof(char)*(strlen(_typeName)+1));
+	PRINTF("\ncontent: %s\n", pModSetTraceObj->content);
+	/*pModSetTraceObj->typeName = my_malloc(sizeof(char)*(strlen(_typeName)+1));
 	strcpy(pModSetTraceObj->typeName, _typeName);
+	PRINTF("\ntypeName: %s\n", pModSetTraceObj->typeName);*/
 	
 	pModSetTraceObj->Delete = delete_ModelSetTrace;
 	pModSetTraceObj->ToString = ModelSetTrace_ToString;
@@ -96,7 +105,7 @@ ModelTrace* newPoly_ModelSetTrace(char* _srcPath, char* _refName, char* _objPath
 	return pObj;
 }
 
-ModelSetTrace* new_ModelSetTrace(char* _srcPath, char* _refName, char* _objPath, char* _content, char* _typeName)
+ModelSetTrace* new_ModelSetTrace(char* _srcPath, char* _refName, /*char* _objPath,*/ char* _content/*, char* _typeName*/)
 {
 	ModelSetTrace* pModSetTraceObj = NULL;
 	ModelTrace* pObj = new_ModelTrace();
@@ -116,12 +125,12 @@ ModelSetTrace* new_ModelSetTrace(char* _srcPath, char* _refName, char* _objPath,
 	strcpy(pObj->srcPath, _srcPath);
 	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
-	pModSetTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
-	strcpy(pModSetTraceObj->objPath, _objPath);
+	/*pModSetTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
+	strcpy(pModSetTraceObj->objPath, _objPath);*/
 	pModSetTraceObj->content = my_malloc(sizeof(char)*(strlen(_content)+1));
 	strcpy(pModSetTraceObj->content, _content);
-	pModSetTraceObj->typeName = my_malloc(sizeof(char)*(strlen(_typeName)+1));
-	strcpy(pModSetTraceObj->typeName, _typeName);
+	/*pModSetTraceObj->typeName = my_malloc(sizeof(char)*(strlen(_typeName)+1));
+	strcpy(pModSetTraceObj->typeName, _typeName);*/
 	
 	pModSetTraceObj->Delete = delete_ModelSetTrace;
 	pModSetTraceObj->ToString = ModelSetTrace_ToString;
@@ -135,9 +144,9 @@ void deletePoly_ModelSetTrace(void* const this)
 	ModelSetTrace* pModSetTraceObj;
 	pModSetTraceObj = ((ModelTrace*)this)->pDerivedObj;
 	/*destroy derived obj*/
-	free(pModSetTraceObj->objPath);
+	/*free(pModSetTraceObj->objPath);*/
 	free(pModSetTraceObj->content);
-	free(pModSetTraceObj->typeName);
+	/*free(pModSetTraceObj->typeName);*/
 	free(pModSetTraceObj);
 	/*destroy base Obj*/
 	delete_ModelTrace(this);
@@ -148,9 +157,9 @@ void delete_ModelSetTrace(void* const this)
 	/* destroy base object */
 	delete_ModelTrace(((ModelSetTrace*)this)->super);
 	/* destroy data memebers */
-	free(((ModelSetTrace*)this)->objPath);
+	/*free(((ModelSetTrace*)this)->objPath);*/
 	free(((ModelSetTrace*)this)->content);
-	free(((ModelSetTrace*)this)->typeName);
+	/*free(((ModelSetTrace*)this)->typeName);*/
 	free(this);
 }
 
@@ -158,51 +167,53 @@ void delete_ModelSetTrace(void* const this)
 char *ModelSetTrace_ToString(void* const this)
 {
 	/*string buffer = "";*/
-	char *buffer = NULL;
+	char *traceBuf = NULL;
 
-	buffer = malloc(strlen("{ \"traceType\" : , \"src\" : \"\", \"refname\" : \"\"}\n") +
+	traceBuf = malloc(TRACE_BUF_SIZE);
+
+	/*buffer = malloc(strlen("{ \"traceType\" : , \"src\" : \"\", \"refname\" : \"\"}\n") +
 			strlen(ActionType(SET)) +
 			strlen(((ModelSetTrace*)this)->super->srcPath) +
-			strlen(((ModelSetTrace*)this)->super->refName) + 1);
+			strlen(((ModelSetTrace*)this)->super->refName) + 1);*/
 	
 	/*buffer.append ("{ \"traceType\" : " + ActionType (SET) + " , \"src\" : \"" + srcPath + "\", \"refname\" : \"" + refName + "\"");*/
-	sprintf(buffer, "{ \"traceType\" : %s, \"src\" : \"%s\", \"refname\" : \"%s\"",
+	sprintf(traceBuf, "{ \"traceType\" : %s, \"src\" : \"%s\", \"refname\" : \"%s\"",
 			ActionType(SET),
 			((ModelSetTrace*)this)->super->srcPath,
 			((ModelSetTrace*)this)->super->refName);
 	
 	/*if (!objPath.empty ())*/
-	if(((ModelSetTrace*)this)->objPath != NULL)
+	/*if(((ModelSetTrace*)this)->objPath != NULL)
 	{
-		/*buffer.append (", \"objpath\" : \"" + objPath + "\"");*/
+		buffer.append (", \"objpath\" : \"" + objPath + "\"");
 		buffer = realloc(buffer, strlen(buffer) +
 				strlen(", \"objpath\" : \"\"") +
 				strlen(((ModelSetTrace*)this)->objPath));
-		sprintf(buffer, "%s, \"objpath\" : \"%s\"", buffer, ((ModelSetTrace*)this)->objPath);
-	}
+		sprintf(traceBuf, "%s, \"objpath\" : \"%s\"", traceBuf, ((ModelSetTrace*)this)->objPath);
+	}*/
 	/*if (!content.empty ())*/
 	if(((ModelSetTrace*)this)->content != NULL)
 	{
-		/*buffer.append (", \"content\" : \"" + content + "\"");*/
+		/*buffer.append (", \"content\" : \"" + content + "\"");
 		buffer = realloc(buffer, strlen(buffer) +
 				strlen(", \"content\" : \"  \"") +
-				strlen(((ModelSetTrace*)this)->content));
-		sprintf(buffer, "%s, \"content\" : \" %s \"", buffer, ((ModelSetTrace*)this)->content);
+				strlen(((ModelSetTrace*)this)->content));*/
+		sprintf(traceBuf, "%s, \"content\" : \" %s \"", traceBuf, ((ModelSetTrace*)this)->content);
 	}
 	/*if (!typeName.empty ())*/
-	if(((ModelSetTrace*)this)->typeName != NULL)
+	/*if(((ModelSetTrace*)this)->typeName != NULL)
 	{
-		/*buffer.append (", \"typename\" : \"" + typeName + "\"");*/
+		buffer.append (", \"typename\" : \"" + typeName + "\"");
 		buffer = realloc(buffer, strlen(buffer) +
 				strlen(", \"typename\" : \"\"") +
 				strlen(((ModelSetTrace*)this)->typeName));
-		sprintf(buffer, "%s, \"typename\" : \"%s\"", buffer, ((ModelSetTrace*)this)->typeName);
-	}
+		sprintf(traceBuf, "%s, \"typename\" : \"%s\"", traceBuf, ((ModelSetTrace*)this)->typeName);
+	}*/
 	
 	/*buffer.append ("}\n");*/
-	sprintf(buffer, "%s }\n", buffer);
+	sprintf(traceBuf, "%s }\n", traceBuf);
 
-	return buffer;
+	return traceBuf;
 }  
 
 /*ModelAddTrace::ModelAddTrace(string _srcPath, string _refName, string _previousPath,string _typeName)
@@ -303,15 +314,17 @@ void delete_ModelAddTrace(void* const this)
 char *ModelAddTrace_ToString(void* const this)
 {
 	/*string buffer = "";*/
-	char *buffer = NULL;
+	char *traceBuf = NULL;
 
-	buffer = malloc(strlen("{ \"traceType\" : , \"src\" : \"\", \"refname\" : \"\"}\n") +
+	traceBuf = malloc(TRACE_BUF_SIZE);
+
+	/*buffer = malloc(strlen("{ \"traceType\" : , \"src\" : \"\", \"refname\" : \"\"}\n") +
 			strlen(ActionType(ADD)) +
 			strlen(((ModelAddTrace*)this)->super->srcPath) +
-			strlen(((ModelAddTrace*)this)->super->refName) + 1);
+			strlen(((ModelAddTrace*)this)->super->refName) + 1);*/
 
 	/*buffer.append ("{ \"traceType\" : " + ActionType (ADD) + " , \"src\" : \"" + srcPath + "\", \"refname\" : \"" + refName + "\"");*/
-	sprintf(buffer, "{ \"traceType\" : %s, \"src\" : \"%s\", \"refname\" : \"%s\"",
+	sprintf(traceBuf, "{ \"traceType\" : %s, \"src\" : \"%s\", \"refname\" : \"%s\"",
 			ActionType(ADD),
 			((ModelAddTrace*)this)->super->srcPath,
 			((ModelAddTrace*)this)->super->refName);
@@ -319,24 +332,24 @@ char *ModelAddTrace_ToString(void* const this)
 	/*if (!previousPath.empty ())*/
 	if(((ModelAddTrace*)this)->previousPath != NULL)
 	{
-		/*buffer.append (", \"previouspath\" : \"" + previousPath + "\"");*/
+		/*buffer.append (", \"previouspath\" : \"" + previousPath + "\"");
 		buffer = realloc(buffer, strlen(buffer) +
 				strlen(", \"previouspath\" : \"\"") +
-				strlen(((ModelAddTrace*)this)->previousPath));
-		sprintf(buffer, "%s, \"previouspath\" : \"%s\"", buffer, ((ModelAddTrace*)this)->previousPath);
+				strlen(((ModelAddTrace*)this)->previousPath));*/
+		sprintf(traceBuf, "%s, \"previouspath\" : \"%s\"", traceBuf, ((ModelAddTrace*)this)->previousPath);
 	}
 	/*if (!typeName.empty ())*/
 	if(((ModelAddTrace*)this)->typeName != NULL)
 	{
-		/*buffer.append (", \"typename\" : \"" + typeName + "\"");*/
+		/*buffer.append (", \"typename\" : \"" + typeName + "\"");
 		buffer = realloc(buffer, strlen(buffer) +
 				strlen("%s, \"typename\" : \"\"") +
-				strlen(((ModelAddTrace*)this)->typeName));
-		sprintf(buffer, "%s, \"typename\" : \"%s\"", buffer, ((ModelAddTrace*)this)->typeName);
+				strlen(((ModelAddTrace*)this)->typeName));*/
+		sprintf(traceBuf, "%s, \"typename\" : \"%s\"", traceBuf, ((ModelAddTrace*)this)->typeName);
 	}
 	/*buffer.append ("}\n");*/
-	sprintf(buffer, "%s }\n", buffer);
-	return buffer;
+	sprintf(traceBuf, "%s }\n", traceBuf);
+	return traceBuf;
 }
 
 
@@ -440,7 +453,7 @@ void deletePoly_ModelRemoveTrace(void* const this)
 	ModelSetTrace* pModSetTraceObj;
 	pModSetTraceObj = ((ModelTrace*)this)->pDerivedObj;
 	/*destroy derived obj*/
-	free(pModSetTraceObj->objPath);
+	free(pModSetTraceObj->content);
 	/*destroy base Obj*/
 	delete_ModelTrace(this);
 }
@@ -487,17 +500,121 @@ ModelRemoveTrace *new_ModelRemoveTrace(char* _srcPath, char* _refName, char* _ob
 char *ModelRemoveTrace_ToString(void* const this)
 {
 	/*return "{ \"traceType\" : " + ActionType (REMOVE) + " , \"src\" : \"" + srcPath + "\", \"refname\" : \"" + refName + "\", \"objpath\" : \"" + objPath + "\" }\n";*/
-	char *buffer = NULL;
+	char *traceBuf = NULL;
 
-	buffer = malloc(strlen("{ \"traceType\" :  , \"src\" : \"  \", \"refname\" : \"  \", \"objpath\" : \"  \" }\n") +
+	traceBuf = malloc(TRACE_BUF_SIZE);
+
+	/*buffer = malloc(strlen("{ \"traceType\" :  , \"src\" : \"  \", \"refname\" : \"  \", \"objpath\" : \"  \" }\n") +
 			strlen(ActionType(REMOVE)) +
 			strlen(((ModelRemoveTrace*)this)->super->srcPath) +
 			strlen(((ModelRemoveTrace*)this)->super->refName) +
-			strlen(((ModelRemoveTrace*)this)->objPath) + 1);
+			strlen(((ModelRemoveTrace*)this)->objPath) + 1);*/
 
-	sprintf(buffer, "{ \"traceType\" : %s , \"src\" : \" %s \", \"refname\" : \" %s \", \"objpath\" : \" %s \" }\n",
+	sprintf(traceBuf, "{ \"traceType\" : %s , \"src\" : \" %s \", \"refname\" : \" %s \", \"objpath\" : \" %s \" }\n",
 			ActionType(REMOVE),
 			((ModelRemoveTrace*)this)->super->srcPath,
 			((ModelRemoveTrace*)this)->super->refName,
 			((ModelRemoveTrace*)this)->objPath);
+
+	return traceBuf;
+}
+
+char* substring(char* origin, char* initialPtr, char* finalPtr)
+{
+	int length = (finalPtr - initialPtr) + 1;
+	char* result = (char*)malloc(length+1);
+	char* t = result;
+	while(initialPtr != finalPtr) {
+	    *t = *initialPtr;
+	    initialPtr++;
+	    t++;
+	}
+	*t = *finalPtr;
+	t++;
+	*t = 0;
+	return result;
+}
+
+char* getId(char* path)
+{
+	char* tmp1 = strchr(path, '[');
+	char* tmp2 = strchr(path, ']');
+	tmp1++;
+	tmp2--;
+	if (tmp1 <= tmp2)
+		return substring(path, tmp1, tmp2);
+	return strdup("");
+}
+
+
+char* getPathType(char* path)
+{
+	char* tmp1 = strchr(path, '[');
+	if (tmp1 != NULL) {
+		tmp1--;
+		return substring(path, path, tmp1);
+	} else {
+		return strdup("");
+	}
+
+}
+
+/*typedef void* (*user_action)(void*, char*, char*, int, char*);*/
+/*void* findByPath(void* root, char* path, user_action action)*/
+
+int extractPath(char *path, char *src, char *refname, char *objpath)
+{
+	char *pathType;
+	char *id;
+	char *nextPath = strchr(path, ']');
+	void *obj;
+	if (nextPath)
+	{
+		nextPath++;
+		pathType = getPathType(path);
+		id = getId(path);
+		if (*nextPath == 0) {
+			// it is the end of he path, it wasn't a path with attribute
+			// return the object
+			id = getId(path);
+			pathType = getPathType(path);
+			/*obj = action(root, pathType, id, 0, 0); // false, null in the end*/
+			free(id);
+			free(pathType);
+			return PATH_OK;
+		}
+		else if (*nextPath == '\\') {
+			// an attribute is coming
+			/*id = getId(path);*/
+			id = getId(path);
+			pathType = getPathType(path);
+			nextPath++;
+			refname = nextPath;
+			/*obj = action(root,pathType, id, 1, nextPath);*/
+			free(id);
+			free(pathType);
+			return PATH_OK;
+		}
+		else if (*nextPath == '/') {
+			// the path continues
+			char *subs = substring(path, path, nextPath);
+			sprintf(src, "%s%s", src, subs);
+			id = getId(path);
+			pathType = getPathType(path);
+			/*obj = action(root, pathType, id, 0, 0);*/
+			free(id);
+			free(pathType);
+			nextPath++;
+			return extractPath(nextPath, src, refname, objpath);
+		}
+		else {
+			// error
+			printf("%s\n", nextPath);
+			return PATH_ERROR; // null
+		}
+	}
+	else {
+		// error
+		return PATH_ERROR; // null
+	}
 }

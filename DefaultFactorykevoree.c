@@ -4,7 +4,7 @@
 #include "json.h"
 #include "jsonparse.h"
 
-#define DEBUG 1
+#define DEBUG 0
 #if DEBUG
 #define PRINTF(...) printf(__VA_ARGS__)
 #else
@@ -1142,8 +1142,8 @@ Dictionary *createDictionary(struct jsonparse_state *jsonState, char jsonType, c
 												jsonparse_copy_value(jsonState, strJson, MAX_STRJSON_SIZE);
 												if(!strcmp(strJson, "org.kevoree.DictionaryType"))
 												{
-													DictionaryType *dictype = createDictionaryType(jsonState, jsonType, strJson);
-													obj->AddValues(obj, dictype);
+													DictionaryValue *dicval = createDictionaryValue(jsonState, jsonType, strJson);
+													obj->AddValues(obj, dicval);
 												}
 												break;
 											}

@@ -199,7 +199,7 @@ void Channel_VisitAttributes(void* const this, char* parent, Visitor* visitor, b
 	Instance_VisitAttributes(((Channel*)this)->super, parent, visitor, recursive);
 }
 
-void Channel_VisitPathAttributes(void* const this, char* parent, Visitor* visitor, int recursive)
+void Channel_VisitPathAttributes(void* const this, char* parent, Visitor* visitor, bool recursive)
 {
 	Instance_VisitPathAttributes(((Channel*)this)->super, parent, visitor, recursive);
 }
@@ -252,7 +252,7 @@ void Channel_VisitReferences(void* const this, char* parent, Visitor* visitor, b
 	Instance_VisitReferences(((Instance*)this)->super, parent, visitor, false);
 }
 
-void Channel_VisitPathReferences(void* const this, char* parent, Visitor* visitor, int recursive)
+void Channel_VisitPathReferences(void* const this, char* parent, Visitor* visitor, bool recursive)
 {
 	int i;
 

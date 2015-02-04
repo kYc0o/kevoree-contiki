@@ -29,6 +29,7 @@ NamedElement* newPoly_Instance()
 
 	pObj->pDerivedObj = pInstanceObj; /* Pointing to derived object */
 
+	pInstanceObj->path = NULL;
 	pInstanceObj->metaData = NULL;
 	pInstanceObj->started = -1;
 	pInstanceObj->typeDefinition = NULL;
@@ -71,6 +72,7 @@ Instance* new_Instance()
 	/*pObj->pDerivedObj = pInstanceObj; Pointing to derived object */
 	pInstanceObj->super = pObj;
 
+	pInstanceObj->path = NULL;
 	pInstanceObj->metaData = NULL;
 	pInstanceObj->started = -1;
 	pInstanceObj->typeDefinition = NULL;

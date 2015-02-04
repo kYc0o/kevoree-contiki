@@ -518,11 +518,11 @@ void* ComponentType_FindByPath(char* attribute, TypeDefinition* const this)
 			if(nextAttribute == NULL)
 			{
 
-				return comptype->FindRequiredByID(comptype, key);
+				return comptype->FindRequiredByID(comptype->super, key);
 			}
 			else
 			{
-				PortTypeRef* ptypref = comptype->FindRequiredByID(comptype, key);
+				PortTypeRef* ptypref = comptype->FindRequiredByID(comptype->super, key);
 				if(ptypref != NULL)
 					return ptypref->FindByPath(nextPath, ptypref);
 				else
@@ -537,11 +537,11 @@ void* ComponentType_FindByPath(char* attribute, TypeDefinition* const this)
 			if(nextAttribute == NULL)
 			{
 
-				return comptype->FindProvidedByID(comptype, key);
+				return comptype->FindProvidedByID(comptype->super, key);
 			}
 			else
 			{
-				PortTypeRef* ptypref = comptype->FindProvidedByID(comptype, key);
+				PortTypeRef* ptypref = comptype->FindProvidedByID(comptype->super, key);
 				if(ptypref != NULL)
 					return ptypref->FindByPath(nextPath, ptypref);
 				else

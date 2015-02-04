@@ -46,9 +46,9 @@ void Channel_AddBindings(Channel* const this, MBinding* ptr);
 void Channel_RemoveBindings(Channel* const this, MBinding* ptr);
 MBinding* Channel_FindBindingsByID(Channel* const this, char* id);
 void Channel_VisitAttributes(void* const this, char* parent, Visitor* visitor, bool recursive);
-void Channel_VisitPathAttributes(void* const this, char* parent, Visitor* visitor, int recursive);
+void Channel_VisitPathAttributes(void* const this, char* parent, Visitor* visitor, bool recursive);
 void Channel_VisitReferences(void* const this, char* parent, Visitor* visitor, bool recursive);
-void Channel_VisitPathReferences(void* const this, char* parent, Visitor* visitor, int recursive);
+void Channel_VisitPathReferences(void* const this, char* parent, Visitor* visitor, bool recursive);
 void* Channel_FindByPath(char* attribute, Channel* const this);
 
 #endif /*__Channel_H */

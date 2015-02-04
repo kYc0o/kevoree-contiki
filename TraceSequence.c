@@ -114,16 +114,18 @@ char *TraceSequence_toString(TraceSequence *const this)
 		if (!isFirst) {
 			mt = list_item_next(mt);
 			sequences = realloc(sequences, strlen(sequences) +
-								strlen(",") +
-								strlen(mt->ToString(mt)) + 1);
-			PRINTF("%s,%s", sequences, mt->ToString(mt));
-			sprintf(sequences, "%s,%s", sequences, mt->ToString(mt));
+					strlen(",") +
+					strlen(mt->ToString(mt->pDerivedObj)) + 1);
+			sprintf(sequences, "%s,%s", sequences, mt->ToString(mt->pDerivedObj));
+			PRINTF("%s,%s", sequences, mt->ToString(mt->pDerivedObj));
 		}
 		else
 		{
 			mt = list_head(this->traces_list);
-			PRINTF("%s%s", sequences, mt->ToString(mt));
-			sprintf(sequences, "%s%s", sequences, mt->ToString(mt));
+			sequences = realloc(sequences, strlen(sequences) +
+					strlen(mt->ToString(mt->pDerivedObj)) + 1);
+			sprintf(sequences, "%s%s", sequences, mt->ToString(mt->pDerivedObj));
+			PRINTF("%s%s", sequences, mt->ToString(mt->pDerivedObj));
 			isFirst = false;
 		}
 	}
@@ -323,4 +325,4 @@ string TraceSequence::toString()  {
 void TraceSequence::reverse(){
 	traces.reverse();
 }
-*/
+ */

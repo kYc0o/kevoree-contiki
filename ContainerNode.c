@@ -231,6 +231,7 @@ void ContainerNode_AddComponents(ContainerNode* const this, ComponentInstance* p
 		{
 			this->components = hashmap_new();
 		}
+
 		if(hashmap_get(this->components, internalKey, (void**)(&container)) == MAP_MISSING)
 		{
 			/*container = (ComponentInstance*)ptr;*/

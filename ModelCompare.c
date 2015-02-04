@@ -81,6 +81,8 @@ list_t Trace_sequence_internal_diff(ModelCompare *const this, ContainerRoot *ori
 	list_t traces_list;
 
 	ModelTrace *mt;
+
+	return NULL;
 }
 
 std::list < ModelTrace * >* ModelCompare::internal_diff (KMFContainer *origin,KMFContainer *target,bool inter, bool merge)

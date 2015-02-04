@@ -1,6 +1,8 @@
+#include <stdlib.h>
+
 #include "KevoreeModelHandlerService.h"
-#include "Bootstraper.h"
 #include "AbstractTypeDefinition.h"
+#include "ContainerRoot.h"
 
 AbstractTypeDefinition *new_AbstractTypeDefinition()
 {
@@ -15,7 +17,10 @@ AbstractTypeDefinition *new_AbstractTypeDefinition()
 		return NULL;
 	}
 
-	pAbstTypDef->pDerivedObj = pAbstTypDef;  /* Pointing to derived object */
+	/*
+	 * Pointing to itself since it's a parent
+	 */
+	pAbstTypDef->pDerivedObj = pAbstTypDef;
 
 	pAbstTypDef->service = NULL;
 	pAbstTypDef->bootstrapService = NULL;
@@ -36,33 +41,42 @@ AbstractTypeDefinition *new_AbstractTypeDefinition()
 	return pAbstTypDef;
 }
 
-void delete_AbstractTypeDefinition(void *const this)
+void delete_AbstractTypeDefinition(AbstractTypeDefinition *const this)
 {
-	AbstractTypeDefinition *pAbstTypDef = (AbstractTypeDefinition*)this;
-
-	if(pAbstTypDef != NULL)
+	if(this != NULL)
 	{
-		free(pAbstTypDef->path);
-		hashmap_free(pAbstTypDef->params);
-		free(pAbstTypDef);
+		free(this->path);
+		if(this->params != NULL) {
+			hashmap_free(this->params);
+		}
+		free(this);
 	}
 }
 
 void AbstractTypeDefinition_start(AbstractTypeDefinition *const this)
 {
-
+	/*
+	 * Virtual function
+	 */
 }
 
 void AbstractTypeDefinition_stop(AbstractTypeDefinition *const this)
 {
-
+	/*
+	 * Virtual function
+	 */
 }
 
-void AbstractTypeDefinition_update(AbstractTypeDefinition *const this)
+void AbstractTypeDefinition_update(AbstractTypeDefinition *const this, int value)
 {
-
+	/*
+	 * Virtual function
+	 */
 }
 
+/*
+ * TODO Implement model services
+ */
 void AbstractTypeDefinition_setModelService(AbstractTypeDefinition *const this, KevoreeModelHandlerService *handler)
 {
 	this->service = handler;
@@ -73,6 +87,9 @@ KevoreeModelHandlerService *AbstractTypeDefinition_getModelService(AbstractTypeD
 	return this->service;
 }
 
+/*
+ * TODO Implement Bootstrapper
+ */
 void AbstractTypeDefinition_setBootStrapperService(AbstractTypeDefinition *const this, Bootstraper *bootstrapService)
 {
 	this->bootstrapService = bootstrapService;
@@ -85,17 +102,22 @@ Bootstraper *AbstractTypeDefinition_getBootStrapperService(AbstractTypeDefinitio
 
 void AbstractTypeDefinition_setPath(AbstractTypeDefinition *const this, char *path)
 {
-	this->path = path;
+	this->path = malloc(sizeof(char) * strlen(path) + 1);
+	if(this->path != NULL) {
+		strcpy(this->path, path);
+	} else {
+		printf("ERROR: There is no enough memory\n");
+	}
 }
 
-KMFContainer *AbstractTypeDefinition_getModelElement(AbstractTypeDefinition *const this)
+void *AbstractTypeDefinition_getModelElement(AbstractTypeDefinition *const this)
 {
 	KevoreeModelHandlerService *kevService = this->service;
 
-	if(kevService != NULL && kevService->getLastModel(kevService) != NULL )
+	if(kevService != NULL && kevService->getLastModel(kevService) != NULL)
 	{
 		ContainerRoot *lastmodel = kevService->getLastModel(kevService);
-		return lastmodel->findByPath(this->path);
+		return lastmodel->FindByPath(this->path, lastmodel);
 	}
 	else
 	{

@@ -215,6 +215,9 @@ void ComponentInstance_AddRequired(ComponentInstance* const this, Port* ptr)
 				ptr->eContainer = my_malloc(sizeof(char) * (strlen(this->eContainer) + strlen("/component[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "%s/component[%s]", this->eContainer, this->InternalGetKey(this));
 			}
+			/*
+			 * TODO add else
+			 */
 		}
 	}
 }

@@ -11,19 +11,19 @@ typedef struct _JSONModelLoader JSONModelLoader;
 typedef struct _ObjectReference ObjectReference;
 
 typedef int (*fptrAddObject)(JSONModelLoader*, ObjectReference*);
-typedef void (*fptrDelete)(void*);
+typedef void (*fptrJSONDelete)(void*);
 
 typedef struct _JSONModelLoader {
 	map_t objects;
 	fptrAddObject addObjectReference;
-	fptrDelete delete;
+	fptrJSONDelete delete;
 } JSONModelLoader;
 
 typedef struct _ObjectReference {
 	char *srcObjectId;
 	char *refId;
 	char *mapId;
-	fptrDelete delete;
+	fptrJSONDelete delete;
 } ObjectReference;
 
 ContainerRoot *JSONKevDeserializer(struct jsonparse_state *jsonState, char _jsonType);
