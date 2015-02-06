@@ -15,7 +15,7 @@ ContainerRoot* new_ContainerRoot(void)
 {
 	ContainerRoot* pObj;
 	/* Allocating memory */
-	pObj = (ContainerRoot*)my_malloc(sizeof(ContainerRoot));
+	pObj = (ContainerRoot*)malloc(sizeof(ContainerRoot));
 
 	if (pObj == NULL)
 	{
@@ -84,7 +84,7 @@ char* ContainerRoot_MetaClassName(ContainerRoot* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("ContainerRoot")) + 1);
+	name = malloc(sizeof(char) * (strlen("ContainerRoot")) + 1);
 	if(name != NULL)
 		strcpy(name, "ContainerRoot");
 	else
@@ -735,7 +735,7 @@ void ContainerRoot_Visit(void* const this, Visitor* visitor)
 	char *cClass = NULL;
 	memset(&path[0], 0, sizeof(path));
 
-	cClass = my_malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((ContainerRoot*)this)->MetaClassName((ContainerRoot*)this))) + 1);
+	cClass = malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((ContainerRoot*)this)->MetaClassName((ContainerRoot*)this))) + 1);
 	sprintf(cClass, "org.kevoree.%s", ((ContainerRoot*)this)->MetaClassName((ContainerRoot*)this));
 	sprintf(path, "eClass");
 	visitor->action(NULL, BRACKET, NULL);
@@ -1268,7 +1268,7 @@ void *ContainerRoot_FindByPath(char *_path, ContainerRoot *const this)
 
 	if(!strcmp(this->generated_KMF_ID, _path))
 	{
-		return this->generated_KMF_ID;
+		return "";
 		/*return this;*/
 	}
 	/* ContainerRoot references */

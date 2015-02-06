@@ -21,7 +21,7 @@ TypeDefinition* newPoly_ComponentType(void)
 		return NULL;
 
 	/* Allocating memory */
-	pCompTypeObj = (ComponentType*)my_malloc(sizeof(ComponentType));
+	pCompTypeObj = (ComponentType*)malloc(sizeof(ComponentType));
 
 	if (pCompTypeObj == NULL)
 	{
@@ -69,7 +69,7 @@ ComponentType* new_ComponentType(void)
 		return NULL;
 
 	/* Allocating memory */
-	pCompTypeObj = (ComponentType*)my_malloc(sizeof(ComponentType));
+	pCompTypeObj = (ComponentType*)malloc(sizeof(ComponentType));
 
 	if (pCompTypeObj == NULL)
 	{
@@ -116,7 +116,7 @@ char* ComponentType_MetaClassName(ComponentType* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("ComponentType")) + 1);
+	name = malloc(sizeof(char) * (strlen("ComponentType")) + 1);
 	if(name != NULL)
 		strcpy(name, "ComponentType");
 	else
@@ -169,7 +169,7 @@ void ComponentType_AddRequired(ComponentType* const this, PortTypeRef* ptr)
 			{
 				TypeDefinition *typdef = this->super;
 				char *strContainer = typdef->InternalGetKey(typdef);
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("typeDefinitions[]") + strlen(strContainer)) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("typeDefinitions[]") + strlen(strContainer)) + 1);
 				sprintf(ptr->eContainer, "typeDefinitions[%s]", strContainer);
 				str_free(strContainer);
 			}
@@ -200,7 +200,7 @@ void ComponentType_AddProvided(ComponentType* const this, PortTypeRef* ptr)
 			{
 				TypeDefinition *typdef = this->super;
 				char *strContainer = typdef->InternalGetKey(typdef);
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("typeDefinitions[]") + strlen(strContainer)) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("typeDefinitions[]") + strlen(strContainer)) + 1);
 				sprintf(ptr->eContainer, "typeDefinitions[%s]", strContainer);
 				str_free(strContainer);
 			}

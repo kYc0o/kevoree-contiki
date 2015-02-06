@@ -15,7 +15,7 @@ NodeNetwork* new_NodeNetwork()
 {
 	NodeNetwork* pObj;
 	/* Allocating memory */
-	pObj = (NodeNetwork*)my_malloc(sizeof(NodeNetwork));
+	pObj = (NodeNetwork*)malloc(sizeof(NodeNetwork));
 
 	if (pObj == NULL)
 	{
@@ -58,7 +58,7 @@ char* NodeNetwork_MetaClassName(NodeNetwork* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("NodeNetwork")) + 1);
+	name = malloc(sizeof(char) * (strlen("NodeNetwork")) + 1);
 	if(name != NULL)
 		strcpy(name, "NodeNetwork");
 	else
@@ -105,7 +105,7 @@ void NodeNetwork_AddLink(NodeNetwork* const this, NodeLink* ptr)
 			/*container = (NodeLink*)ptr;*/
 			if(hashmap_put(this->link, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("nodeNetwork[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("nodeNetwork[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "nodeNetwork[%s]", this->InternalGetKey(this));
 			}
 		}

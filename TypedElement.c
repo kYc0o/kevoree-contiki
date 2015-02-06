@@ -17,7 +17,7 @@ NamedElement* newPoly_TypedElement(void)
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pTypeElemObj = (TypedElement*)my_malloc(sizeof(TypedElement));
+	pTypeElemObj = (TypedElement*)malloc(sizeof(TypedElement));
 
 	if (pTypeElemObj == NULL)
 	{
@@ -55,7 +55,7 @@ TypedElement* new_TypedElement(void)
 		return NULL;
 
 	/* Allocating memory */
-	pTypeElemObj = (TypedElement*)my_malloc(sizeof(TypedElement));
+	pTypeElemObj = (TypedElement*)malloc(sizeof(TypedElement));
 
 	if (pTypeElemObj == NULL)
 	{
@@ -89,7 +89,7 @@ char* TypedElement_MetaClassName(TypedElement* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("TypedElement")) + 1);
+	name = malloc(sizeof(char) * (strlen("TypedElement")) + 1);
 	if(name != NULL)
 		strcpy(name, "TypedElement");
 	else

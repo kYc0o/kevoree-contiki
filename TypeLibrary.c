@@ -17,7 +17,7 @@ NamedElement* newPoly_TypeLibrary(void)
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pTypeLibObj = (TypeLibrary*)my_malloc(sizeof(TypeLibrary));
+	pTypeLibObj = (TypeLibrary*)malloc(sizeof(TypeLibrary));
 
 	if (pTypeLibObj == NULL)
 	{
@@ -55,7 +55,7 @@ TypeLibrary* new_TypeLibrary(void)
 		return NULL;
 
 	/* Allocating memory */
-	pTypeLibObj = (TypeLibrary*)my_malloc(sizeof(TypeLibrary));
+	pTypeLibObj = (TypeLibrary*)malloc(sizeof(TypeLibrary));
 
 	if (pTypeLibObj == NULL)
 	{
@@ -88,7 +88,7 @@ char* TypeLibrary_MetaClassname(TypeLibrary* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("TypeLibrary")) + 1);
+	name = malloc(sizeof(char) * (strlen("TypeLibrary")) + 1);
 	if(name != NULL)
 		strcpy(name, "TypeLibrary");
 	else

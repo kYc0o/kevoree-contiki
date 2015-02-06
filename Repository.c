@@ -12,7 +12,7 @@ Repository* new_Repository()
 {
 	Repository* pObj;
 	/* Allocating memory */
-	pObj = (Repository*)my_malloc(sizeof(Repository));
+	pObj = (Repository*)malloc(sizeof(Repository));
 
 	if (pObj == NULL)
 	{
@@ -36,7 +36,7 @@ char* Repository_MetaClassName(Repository* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("Repository")) + 1);
+	name = malloc(sizeof(char) * (strlen("Repository")) + 1);
 	if(name != NULL)
 		strcpy(name, "Repository");
 	else
@@ -68,7 +68,7 @@ void Repository_VisitAttributes(void* const this, char* parent, Visitor* visitor
 	char *cClass = NULL;
 	memset(&path[0], 0, sizeof(path));
 
-	cClass = my_malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((Repository*)this)->MetaClassName((Repository*)this))) + 1);
+	cClass = malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((Repository*)this)->MetaClassName((Repository*)this))) + 1);
 	sprintf(cClass, "org.kevoree.%s", ((Repository*)this)->MetaClassName((Repository*)this));
 	sprintf(path,"eClass");
 	visitor->action(path, STRING, cClass);

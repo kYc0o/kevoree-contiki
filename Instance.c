@@ -19,7 +19,7 @@ NamedElement* newPoly_Instance()
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pInstanceObj = (Instance*)my_malloc(sizeof(Instance));
+	pInstanceObj = (Instance*)malloc(sizeof(Instance));
 
 	if (pInstanceObj == NULL)
 	{
@@ -62,7 +62,7 @@ Instance* new_Instance()
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pInstanceObj = (Instance*)my_malloc(sizeof(Instance));
+	pInstanceObj = (Instance*)malloc(sizeof(Instance));
 
 	if (pInstanceObj == NULL)
 	{
@@ -125,7 +125,7 @@ void Instance_AddTypeDefinition(Instance* this, TypeDefinition* ptr)
 void Instance_AddDictionary(Instance* const this, Dictionary* ptr)
 {
 	this->dictionary = ptr;
-	ptr->eContainer = my_malloc(sizeof(char) * (strlen("instance[]") + strlen(this->InternalGetKey(this))) + 1);
+	ptr->eContainer = malloc(sizeof(char) * (strlen("instance[]") + strlen(this->InternalGetKey(this))) + 1);
 	sprintf(ptr->eContainer, "instance[%s]", this->InternalGetKey(this));
 }
 
@@ -150,7 +150,7 @@ void Instance_AddFragmentDictionary(Instance* const this, FragmentDictionary* pt
 			/*container = (FragmentDictionary*)ptr;*/
 			if(hashmap_put(this->fragmentDictionary, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("instance[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("instance[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "instance[%s]", this->InternalGetKey(this));
 			}
 		}
@@ -193,7 +193,7 @@ char* Instance_MetaClassName(Instance* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("Instance")) + 1);
+	name = malloc(sizeof(char) * (strlen("Instance")) + 1);
 	if(name != NULL)
 		strcpy(name, "Instance");
 	else

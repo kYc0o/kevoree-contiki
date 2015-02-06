@@ -23,7 +23,7 @@ Instance* newPoly_ContainerNode()
 	Instance* pObj = new_Instance();
 
 	/* Allocating memory */
-	pContNodeObj = (ContainerNode*)my_malloc(sizeof(pContNodeObj));
+	pContNodeObj = (ContainerNode*)malloc(sizeof(pContNodeObj));
 
 	if (pContNodeObj == NULL)
 	{
@@ -78,7 +78,7 @@ ContainerNode* new_ContainerNode()
 		return NULL;
 
 	/* Allocating memory */
-	pContNodeObj = (ContainerNode*)my_malloc(sizeof(ContainerNode));
+	pContNodeObj = (ContainerNode*)malloc(sizeof(ContainerNode));
 
 	if (pContNodeObj == NULL)
 	{
@@ -134,7 +134,7 @@ char* ContainerNode_MetaClassName(ContainerNode* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("ContainerNode")) + 1);
+	name = malloc(sizeof(char) * (strlen("ContainerNode")) + 1);
 	if(name != NULL)
 		strcpy(name, "ContainerNode");
 	else
@@ -237,7 +237,7 @@ void ContainerNode_AddComponents(ContainerNode* const this, ComponentInstance* p
 			/*container = (ComponentInstance*)ptr;*/
 			if(hashmap_put(this->components, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("node[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("node[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "node[%s]", this->InternalGetKey(this));
 			}
 		}
@@ -318,7 +318,7 @@ void ContainerNode_AddNetworkInformation(ContainerNode* const this, NetworkInfo*
 			/*container = (NetworkInfo*)ptr;*/
 			if(hashmap_put(this->networkInformation, internalKey, ptr) == 0)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("node[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("node[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "node[%s]", this->InternalGetKey(this));
 			}
 		}

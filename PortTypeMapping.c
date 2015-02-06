@@ -17,7 +17,7 @@ PortTypeMapping* new_PortTypeMapping()
 {
 	PortTypeMapping* pObj;
 	/* Allocating memory */
-	pObj = (PortTypeMapping*)my_malloc(sizeof(PortTypeMapping));
+	pObj = (PortTypeMapping*)malloc(sizeof(PortTypeMapping));
 
 	if (pObj == NULL)
 	{
@@ -49,7 +49,7 @@ char* PortTypeMapping_MetaClassName(PortTypeMapping* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("PortTypeMapping")) + 1);
+	name = malloc(sizeof(char) * (strlen("PortTypeMapping")) + 1);
 	if(name != NULL)
 		strcpy(name, "PortTypeMapping");
 	else

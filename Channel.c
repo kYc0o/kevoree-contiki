@@ -20,7 +20,7 @@ Instance* newPoly_Channel()
 	Instance* pObj = new_Instance();
 
 	/* Allocating memory */
-	pChannelObj = (Channel*)my_malloc(sizeof(Channel));
+	pChannelObj = (Channel*)malloc(sizeof(Channel));
 
 	if (pChannelObj == NULL)
 	{
@@ -60,7 +60,7 @@ Channel* new_Channel()
 		return NULL;
 
 	/* Allocating memory */
-	pChannelObj = (Channel*)my_malloc(sizeof(Channel));
+	pChannelObj = (Channel*)malloc(sizeof(Channel));
 
 	if (pChannelObj == NULL)
 	{
@@ -124,7 +124,7 @@ char* Channel_MetaClassName(Channel* const this)
 {
 	char *name = NULL;
 
-	name = my_malloc(sizeof(char) * (strlen("Channel")) + 1);
+	name = malloc(sizeof(char) * (strlen("Channel")) + 1);
 	if(name != NULL)
 		strcpy(name, "Channel");
 	else

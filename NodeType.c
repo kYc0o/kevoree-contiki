@@ -16,7 +16,7 @@ TypeDefinition* newPoly_NodeType()
 	TypeDefinition* pObj = new_TypeDefinition();
 
 	/* Allocating memory */
-	pNodeTypeObj = (NodeType*)my_malloc(sizeof(NodeType));
+	pNodeTypeObj = (NodeType*)malloc(sizeof(NodeType));
 
 	if (pNodeTypeObj == NULL)
 	{
@@ -48,7 +48,7 @@ NodeType* new_NodeType()
 		return NULL;
 
 	/* Allocating memory */
-	pNodeTypeObj = (NodeType*)my_malloc(sizeof(NodeType));
+	pNodeTypeObj = (NodeType*)malloc(sizeof(NodeType));
 
 	if (pNodeTypeObj == NULL)
 	{
@@ -80,7 +80,7 @@ char* NodeType_MetaClassName(NodeType* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("NodeType")) + 1);
+	name = malloc(sizeof(char) * (strlen("NodeType")) + 1);
 	if(name != NULL)
 		strcpy(name, "NodeType");
 	else

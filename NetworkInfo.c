@@ -19,7 +19,7 @@ NamedElement* newPoly_NetworkInfo()
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pNetInfoObj = (NetworkInfo*)my_malloc(sizeof(NetworkInfo));
+	pNetInfoObj = (NetworkInfo*)malloc(sizeof(NetworkInfo));
 
 	if (pNetInfoObj == NULL)
 	{
@@ -58,7 +58,7 @@ NetworkInfo* new_NetworkInfo()
 		return NULL;
 
 	/* Allocating memory */
-	pNetInfoObj = (NetworkInfo*)my_malloc(sizeof(NetworkInfo));
+	pNetInfoObj = (NetworkInfo*)malloc(sizeof(NetworkInfo));
 
 	if (pNetInfoObj == NULL)
 	{
@@ -98,7 +98,7 @@ char* NetworkInfo_MetaClassName(NetworkInfo* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("NetworkInfo")) + 1);
+	name = malloc(sizeof(char) * (strlen("NetworkInfo")) + 1);
 	if(name != NULL)
 		strcpy(name, "NetworkInfo");
 	else
@@ -128,7 +128,7 @@ void NetworkInfo_AddValues(NetworkInfo* const this, NetworkProperty* ptr)
 			/*container = (NetworkProperty*)ptr;*/
 			if(hashmap_put(this->values, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainerNI = my_malloc(sizeof(char) * (strlen("networkInfo[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainerNI = malloc(sizeof(char) * (strlen("networkInfo[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainerNI, "networkInfo[%s]", this->InternalGetKey(this));
 			}
 		}

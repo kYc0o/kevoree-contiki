@@ -13,7 +13,7 @@ DictionaryValue* new_DictionaryValue(void)
 {
 	DictionaryValue* pObj = NULL;
 	/* Allocating memory */
-	pObj = (DictionaryValue*)my_malloc(sizeof(DictionaryValue));
+	pObj = (DictionaryValue*)malloc(sizeof(DictionaryValue));
 
 	if (pObj == NULL)
 	{
@@ -55,7 +55,7 @@ char* DictionaryValue_MetaClassName(DictionaryValue* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("DictionaryValue")) + 1);
+	name = malloc(sizeof(char) * (strlen("DictionaryValue")) + 1);
 	if(name != NULL)
 		strcpy(name, "DictionaryValue");
 	else
@@ -70,7 +70,7 @@ void DictionaryValue_VisitAttributes(void *const this, char *parent, Visitor *vi
 	char *cClass = NULL;
 	memset(&path[0], 0, sizeof(path));
 
-	cClass = my_malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((DictionaryValue*)this)->MetaClassName((DictionaryValue*)this))) + 1);
+	cClass = malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((DictionaryValue*)this)->MetaClassName((DictionaryValue*)this))) + 1);
 	sprintf(cClass, "org.kevoree.%s", ((DictionaryValue*)this)->MetaClassName((DictionaryValue*)this));
 	sprintf(path,"eClass");
 	visitor->action(path, STRING, cClass);

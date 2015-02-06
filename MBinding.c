@@ -17,7 +17,7 @@ MBinding* new_MBinding(void)
 {
 	MBinding* pObj = NULL;
 	/* Allocating memory */
-	pObj = (MBinding*)my_malloc(sizeof(MBinding));
+	pObj = (MBinding*)malloc(sizeof(MBinding));
 
 	if (pObj == NULL)
 	{
@@ -65,7 +65,7 @@ char* MBinding_MetaClassName(MBinding* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("MBinding")) + 1);
+	name = malloc(sizeof(char) * (strlen("MBinding")) + 1);
 	if(name != NULL)
 		strcpy(name, "MBinding");
 	else
@@ -109,7 +109,7 @@ void MBinding_VisitAttributes(void *const this, char *parent, Visitor *visitor, 
 
 	if(recursive)
 	{
-		cClass = my_malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((MBinding*)this)->MetaClassName((MBinding*)this))) + 1);
+		cClass = malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((MBinding*)this)->MetaClassName((MBinding*)this))) + 1);
 		sprintf(cClass, "org.kevoree.%s", ((MBinding*)this)->MetaClassName((MBinding*)this));
 		sprintf(path,"eClass");
 		visitor->action(path, STRING, cClass);

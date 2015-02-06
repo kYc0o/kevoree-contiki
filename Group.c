@@ -22,7 +22,7 @@ Instance* newPoly_Group()
 	Instance* pObj = new_Instance();
 
 	/* Allocating memory */
-	pGroupObj = (Group*)my_malloc(sizeof(Group));
+	pGroupObj = (Group*)malloc(sizeof(Group));
 
 	if (pGroupObj == NULL)
 	{
@@ -61,7 +61,7 @@ Group* new_Group()
 		return NULL;
 
 	/* Allocating memory */
-	pGroupObj = (Group*)my_malloc(sizeof(Group));
+	pGroupObj = (Group*)malloc(sizeof(Group));
 
 	if (pGroupObj == NULL)
 	{
@@ -101,7 +101,7 @@ char* Group_MetaClassName(Group* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("Group")) + 1);
+	name = malloc(sizeof(char) * (strlen("Group")) + 1);
 	if(name != NULL)
 		strcpy(name, "Group");
 	else

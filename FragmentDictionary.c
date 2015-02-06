@@ -16,7 +16,7 @@ Dictionary* newPoly_FragmentDictionary()
 	Dictionary* pObj = new_Dictionary();
 
 	/* Allocating memory */
-	pFragDicObj = (FragmentDictionary*)my_malloc(sizeof(FragmentDictionary));
+	pFragDicObj = (FragmentDictionary*)malloc(sizeof(FragmentDictionary));
 
 	if (pFragDicObj == NULL)
 	{
@@ -54,7 +54,7 @@ FragmentDictionary* new_FragmentDictionary(void)
 		return NULL;
 
 	/* Allocating memory */
-	pFragDicObj = (FragmentDictionary*)my_malloc(sizeof(FragmentDictionary));
+	pFragDicObj = (FragmentDictionary*)malloc(sizeof(FragmentDictionary));
 
 	if (pFragDicObj == NULL)
 	{
@@ -119,7 +119,7 @@ char* FragmentDictionary_MetaClassName(FragmentDictionary* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("FragmentDictionary")) + 1);
+	name = malloc(sizeof(char) * (strlen("FragmentDictionary")) + 1);
 	if(name != NULL)
 		strcpy(name, "FragmentDictionary");
 	else

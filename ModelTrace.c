@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "ModelTrace.h"
 #include "ActionType.h"
 
@@ -22,7 +24,7 @@ ModelTrace* new_ModelTrace()
 {
 	ModelTrace* pObj = NULL;
 	/* Allocating memory */
-	pObj = (ModelTrace*)my_malloc(sizeof(ModelTrace));
+	pObj = (ModelTrace*)malloc(sizeof(ModelTrace));
 
 	if (pObj == NULL)
 	{
@@ -71,7 +73,7 @@ ModelTrace* newPoly_ModelSetTrace(char* _srcPath, char* _refName, /*char* _objPa
 	ModelTrace* pObj = new_ModelTrace();
 
 	/* Allocating memory */
-	pModSetTraceObj = (ModelSetTrace*)my_malloc(sizeof(ModelSetTrace));
+	pModSetTraceObj = (ModelSetTrace*)malloc(sizeof(ModelSetTrace));
 
 	if (pModSetTraceObj == NULL)
 	{
@@ -82,16 +84,16 @@ ModelTrace* newPoly_ModelSetTrace(char* _srcPath, char* _refName, /*char* _objPa
 	pObj->pDerivedObj = pModSetTraceObj; /* Pointing to derived object */
 	pModSetTraceObj->super = pObj;
 	
-	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
+	pObj->srcPath = malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
 	PRINTF("\nsrcPath: %s\n", pModSetTraceObj->super->srcPath);
-	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
+	pObj->refName = malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
 	PRINTF("\nrefName: %s\n", pModSetTraceObj->super->refName);
 	/*pModSetTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
 	strcpy(pModSetTraceObj->objPath, _objPath);
 	PRINTF("\nobjPath: %s\n", pModSetTraceObj->objPath);*/
-	pModSetTraceObj->content = my_malloc(sizeof(char)*(strlen(_content)+1));
+	pModSetTraceObj->content = malloc(sizeof(char)*(strlen(_content)+1));
 	strcpy(pModSetTraceObj->content, _content);
 	PRINTF("\ncontent: %s\n", pModSetTraceObj->content);
 	/*pModSetTraceObj->typeName = my_malloc(sizeof(char)*(strlen(_typeName)+1));
@@ -111,7 +113,7 @@ ModelSetTrace* new_ModelSetTrace(char* _srcPath, char* _refName, /*char* _objPat
 	ModelTrace* pObj = new_ModelTrace();
 
 	/* Allocating memory */
-	pModSetTraceObj = (ModelSetTrace*)my_malloc(sizeof(ModelSetTrace));
+	pModSetTraceObj = (ModelSetTrace*)malloc(sizeof(ModelSetTrace));
 
 	if (pModSetTraceObj == NULL)
 	{
@@ -121,13 +123,13 @@ ModelSetTrace* new_ModelSetTrace(char* _srcPath, char* _refName, /*char* _objPat
 	/*pObj->pDerivedObj = pInstanceObj; Pointing to derived object */
 	pModSetTraceObj->super = pObj;
 	
-	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
+	pObj->srcPath = malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
-	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
+	pObj->refName = malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
 	/*pModSetTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
 	strcpy(pModSetTraceObj->objPath, _objPath);*/
-	pModSetTraceObj->content = my_malloc(sizeof(char)*(strlen(_content)+1));
+	pModSetTraceObj->content = malloc(sizeof(char)*(strlen(_content)+1));
 	strcpy(pModSetTraceObj->content, _content);
 	/*pModSetTraceObj->typeName = my_malloc(sizeof(char)*(strlen(_typeName)+1));
 	strcpy(pModSetTraceObj->typeName, _typeName);*/
@@ -230,7 +232,7 @@ ModelTrace* newPoly_ModelAddTrace(char* _srcPath, char* _refName, char* _previou
 	ModelTrace* pObj = new_ModelTrace();
 
 	/* Allocating memory */
-	pModAddTraceObj = (ModelAddTrace*)my_malloc(sizeof(ModelAddTrace));
+	pModAddTraceObj = (ModelAddTrace*)malloc(sizeof(ModelAddTrace));
 
 	if (pModAddTraceObj == NULL)
 	{
@@ -241,13 +243,13 @@ ModelTrace* newPoly_ModelAddTrace(char* _srcPath, char* _refName, char* _previou
 	pObj->pDerivedObj = pModAddTraceObj; /* Pointing to derived object */
 	pModAddTraceObj->super = pObj;
 	
-	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
+	pObj->srcPath = malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
-	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
+	pObj->refName = malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
-	pModAddTraceObj->previousPath = my_malloc(sizeof(char)*(strlen(_previousPath)+1));
+	pModAddTraceObj->previousPath = malloc(sizeof(char)*(strlen(_previousPath)+1));
 	strcpy(pModAddTraceObj->previousPath, _previousPath);
-	pModAddTraceObj->typeName = my_malloc(sizeof(char)*(strlen(_typeName)+1));
+	pModAddTraceObj->typeName = malloc(sizeof(char)*(strlen(_typeName)+1));
 	strcpy(pModAddTraceObj->typeName, _typeName);
 	
 	pModAddTraceObj->Delete = delete_ModelAddTrace;
@@ -263,7 +265,7 @@ ModelAddTrace* new_ModelAddTrace(char* _srcPath, char* _refName, char* _previous
 	ModelTrace* pObj = new_ModelTrace();
 
 	/* Allocating memory */
-	pModAddTraceObj = (ModelAddTrace*)my_malloc(sizeof(ModelAddTrace));
+	pModAddTraceObj = (ModelAddTrace*)malloc(sizeof(ModelAddTrace));
 
 	if (pModAddTraceObj == NULL)
 	{
@@ -273,13 +275,13 @@ ModelAddTrace* new_ModelAddTrace(char* _srcPath, char* _refName, char* _previous
 	/*pObj->pDerivedObj = pInstanceObj; Pointing to derived object */
 	pModAddTraceObj->super = pObj;
 	
-	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
+	pObj->srcPath = malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
-	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
+	pObj->refName = malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
-	pModAddTraceObj->previousPath = my_malloc(sizeof(char)*(strlen(_previousPath)+1));
+	pModAddTraceObj->previousPath = malloc(sizeof(char)*(strlen(_previousPath)+1));
 	strcpy(pModAddTraceObj->previousPath, _previousPath);
-	pModAddTraceObj->typeName = my_malloc(sizeof(char)*(strlen(_typeName)+1));
+	pModAddTraceObj->typeName = malloc(sizeof(char)*(strlen(_typeName)+1));
 	strcpy(pModAddTraceObj->typeName, _typeName);
 	
 	pModAddTraceObj->Delete = delete_ModelAddTrace;
@@ -419,7 +421,7 @@ ModelTrace *newPoly_ModelRemoveTrace(char* _srcPath, char* _refName, char* _objP
 	ModelTrace* pObj = new_ModelTrace();
 
 	/* Allocating memory */
-	pModRemTraceObj = (ModelRemoveTrace*)my_malloc(sizeof(ModelRemoveTrace));
+	pModRemTraceObj = (ModelRemoveTrace*)malloc(sizeof(ModelRemoveTrace));
 
 	if (pModRemTraceObj == NULL)
 	{
@@ -430,11 +432,11 @@ ModelTrace *newPoly_ModelRemoveTrace(char* _srcPath, char* _refName, char* _objP
 	pObj->pDerivedObj = pModRemTraceObj; /* Pointing to derived object */
 	pModRemTraceObj->super = pObj;
 	
-	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
+	pObj->srcPath = malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
-	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
+	pObj->refName = malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
-	pModRemTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
+	pModRemTraceObj->objPath = malloc(sizeof(char)*(strlen(_objPath)+1));
 	strcpy(pModRemTraceObj->objPath, _objPath);
 	
 	pModRemTraceObj->Delete = delete_ModelRemoveTrace;
@@ -472,7 +474,7 @@ ModelRemoveTrace *new_ModelRemoveTrace(char* _srcPath, char* _refName, char* _ob
 	ModelRemoveTrace* pModRemTraceObj = NULL;
 	ModelTrace* pObj = new_ModelTrace();
 
-	pModRemTraceObj = (ModelRemoveTrace*)my_malloc(sizeof(ModelRemoveTrace));
+	pModRemTraceObj = (ModelRemoveTrace*)malloc(sizeof(ModelRemoveTrace));
 
 	if (pModRemTraceObj == NULL)
 	{
@@ -482,11 +484,11 @@ ModelRemoveTrace *new_ModelRemoveTrace(char* _srcPath, char* _refName, char* _ob
 	/*pObj->pDerivedObj = pInstanceObj; Pointing to derived object */
 	pModRemTraceObj->super = pObj;
 
-	pObj->srcPath = my_malloc(sizeof(char)*(strlen(_srcPath)+1));
+	pObj->srcPath = malloc(sizeof(char)*(strlen(_srcPath)+1));
 	strcpy(pObj->srcPath, _srcPath);
-	pObj->refName = my_malloc(sizeof(char)*(strlen(_refName)+1));
+	pObj->refName = malloc(sizeof(char)*(strlen(_refName)+1));
 	strcpy(pObj->refName, _refName);
-	pModRemTraceObj->objPath = my_malloc(sizeof(char)*(strlen(_objPath)+1));
+	pModRemTraceObj->objPath = malloc(sizeof(char)*(strlen(_objPath)+1));
 	strcpy(pModRemTraceObj->objPath, _objPath);
 
 	pModRemTraceObj->Delete = delete_ModelRemoveTrace;
@@ -535,7 +537,7 @@ char* substring(char* origin, char* initialPtr, char* finalPtr)
 	return result;
 }
 
-char* getId(char* path)
+char *getId(char* path)
 {
 	char* tmp1 = strchr(path, '[');
 	char* tmp2 = strchr(path, ']');
@@ -546,8 +548,7 @@ char* getId(char* path)
 	return strdup("");
 }
 
-
-char* getPathType(char* path)
+char *getPathType(char* path)
 {
 	char* tmp1 = strchr(path, '[');
 	if (tmp1 != NULL) {

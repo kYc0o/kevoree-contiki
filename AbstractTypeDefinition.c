@@ -10,7 +10,7 @@ AbstractTypeDefinition *new_AbstractTypeDefinition()
 
 	/* Allocating memory */
 	/* TODO Change for MEMB */
-	pAbstTypDef = (AbstractTypeDefinition*)my_malloc(sizeof(AbstractTypeDefinition));
+	pAbstTypDef = (AbstractTypeDefinition*)malloc(sizeof(AbstractTypeDefinition));
 
 	if (pAbstTypDef == NULL)
 	{

@@ -19,7 +19,7 @@ NamedElement* newPoly_NetworkProperty()
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pNetPropObj = (NetworkProperty*)my_malloc(sizeof(NetworkProperty));
+	pNetPropObj = (NetworkProperty*)malloc(sizeof(NetworkProperty));
 
 	if (pNetPropObj == NULL)
 	{
@@ -53,7 +53,7 @@ NetworkProperty* new_NetworkProperty()
 		return NULL;
 
 	/* Allocating memory */
-	pNetPropObj = (NetworkProperty*)my_malloc(sizeof(NetworkProperty));
+	pNetPropObj = (NetworkProperty*)malloc(sizeof(NetworkProperty));
 
 	if (pNetPropObj == NULL)
 	{
@@ -87,7 +87,7 @@ char* NetworkProperty_MetaClassName(NetworkProperty* const this)
 {
 	char *name = NULL;
 
-	name = my_malloc(sizeof(char) * (strlen("NetworkProperty")) + 1);
+	name = malloc(sizeof(char) * (strlen("NetworkProperty")) + 1);
 	if(name != NULL)
 		strcpy(name, "NetworkProperty");
 	else

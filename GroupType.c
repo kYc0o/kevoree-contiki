@@ -19,7 +19,7 @@ TypeDefinition* newPoly_GroupType()
 		return NULL;
 
 	/* Allocating memory */
-	pGroupTypeObj = (GroupType*)my_malloc(sizeof(GroupType));
+	pGroupTypeObj = (GroupType*)malloc(sizeof(GroupType));
 
 	if (pGroupTypeObj == NULL)
 	{
@@ -50,7 +50,7 @@ GroupType* new_GroupType()
 		return NULL;
 
 	/* Allocating memory */
-	pGroupTypeObj = (GroupType*)my_malloc(sizeof(GroupType));
+	pGroupTypeObj = (GroupType*)malloc(sizeof(GroupType));
 
 	if (pGroupTypeObj == NULL)
 	{
@@ -75,7 +75,7 @@ char* GroupType_MetaClassName(GroupType* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("GroupType")) + 1);
+	name = malloc(sizeof(char) * (strlen("GroupType")) + 1);
 	if(name != NULL)
 		strcpy(name, "GroupType");
 	else

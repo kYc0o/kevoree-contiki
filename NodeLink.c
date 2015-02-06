@@ -15,7 +15,7 @@ NodeLink* new_NodeLink()
 {
 	NodeLink* pObj;
 	/* Allocating memory */
-	pObj = (NodeLink*)my_malloc(sizeof(NodeLink));
+	pObj = (NodeLink*)malloc(sizeof(NodeLink));
 
 	if (pObj == NULL)
 	{
@@ -57,7 +57,7 @@ char* NodeLink_MetaClassName(NodeLink* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("NodeLink")) + 1);
+	name = malloc(sizeof(char) * (strlen("NodeLink")) + 1);
 	if(name != NULL)
 		strcpy(name, "NodeLink");
 	else
@@ -105,7 +105,7 @@ void NodeLink_AddNetworkProperties(NodeLink* const this, NetworkProperty* ptr)
 			/*container = (NetworkProperty*)ptr;*/
 			if(hashmap_put(this->networkProperties, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainerNL = my_malloc(sizeof(char) * (strlen("nodeLink[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainerNL = malloc(sizeof(char) * (strlen("nodeLink[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainerNL, "nodeLink[%s]", this->InternalGetKey(this));
 			}
 		}

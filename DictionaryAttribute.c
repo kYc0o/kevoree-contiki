@@ -17,7 +17,7 @@ TypedElement* newPoly_DictionaryAttribute()
 	TypedElement* pObj = new_TypedElement();
 
 	/* Allocating memory */
-	pDicAttrObj = (DictionaryAttribute*)my_malloc(sizeof(DictionaryAttribute));
+	pDicAttrObj = (DictionaryAttribute*)malloc(sizeof(DictionaryAttribute));
 
 	if (pDicAttrObj == NULL)
 	{
@@ -58,7 +58,7 @@ DictionaryAttribute* new_DictionaryAttribute()
 		return NULL;
 
 	/* Allocating memory */
-	pDicAttrObj = (DictionaryAttribute*)my_malloc(sizeof(DictionaryAttribute));
+	pDicAttrObj = (DictionaryAttribute*)malloc(sizeof(DictionaryAttribute));
 
 	if (pDicAttrObj == NULL)
 	{
@@ -135,7 +135,7 @@ char* DictionaryAttribute_MetaClassName(DictionaryAttribute* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("DictionaryAttribute")) + 1);
+	name = malloc(sizeof(char) * (strlen("DictionaryAttribute")) + 1);
 	if(name != NULL)
 		strcpy(name, "DictionaryAttribute");
 	else

@@ -19,7 +19,7 @@ NamedElement* newPoly_PortTypeRef(void)
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pPortTypeRefObj = (PortTypeRef*)my_malloc(sizeof(PortTypeRef));
+	pPortTypeRefObj = (PortTypeRef*)malloc(sizeof(PortTypeRef));
 
 	if (pPortTypeRefObj == NULL)
 	{
@@ -62,7 +62,7 @@ PortTypeRef* new_PortTypeRef(void)
 		return NULL;
 
 	/* Allocating memory */
-	pPortTypeRefObj = (PortTypeRef*)my_malloc(sizeof(PortTypeRef));
+	pPortTypeRefObj = (PortTypeRef*)malloc(sizeof(PortTypeRef));
 
 	if (pPortTypeRefObj == NULL)
 	{
@@ -100,7 +100,7 @@ char* PortTypeRef_MetaClassName(PortTypeRef* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("PortTypeRef")) + 1);
+	name = malloc(sizeof(char) * (strlen("PortTypeRef")) + 1);
 	if(name != NULL)
 		strcpy(name, "PortTypeRef");
 	else
@@ -157,7 +157,7 @@ void PortTypeRef_AddMappings(PortTypeRef* const this, PortTypeMapping* ptr)
 			/*container = (PortTypeMapping*)ptr;*/
 			if(hashmap_put(this->mappings, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("portTypeRef[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("portTypeRef[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "portTypeRef[%s]", this->InternalGetKey(this));
 			}
 		}

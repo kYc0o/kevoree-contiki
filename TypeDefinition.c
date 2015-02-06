@@ -20,7 +20,7 @@ NamedElement* newPoly_TypeDefinition()
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pTypeDefObj = (TypeDefinition*)my_malloc(sizeof(TypeDefinition));
+	pTypeDefObj = (TypeDefinition*)malloc(sizeof(TypeDefinition));
 
 	if (pTypeDefObj == NULL)
 	{
@@ -68,7 +68,7 @@ TypeDefinition* new_TypeDefinition()
 		return NULL;
 
 	/* Allocating memory */
-	pTypeDefObj = (TypeDefinition*)my_malloc(sizeof(TypeDefinition));
+	pTypeDefObj = (TypeDefinition*)malloc(sizeof(TypeDefinition));
 
 	if (pTypeDefObj == NULL)
 	{
@@ -113,7 +113,7 @@ char* TypeDefinition_InternalGetKey(TypeDefinition* const this)
 	if (this == NULL)
 		return NULL;
 
-	internalKey = my_malloc(sizeof(char) * (strlen(this->super->name) + strlen("/") + strlen(this->version)) + 1);
+	internalKey = malloc(sizeof(char) * (strlen(this->super->name) + strlen("/") + strlen(this->version)) + 1);
 
 	if (internalKey == NULL)
 		return NULL;
@@ -127,7 +127,7 @@ char* TypeDefinition_MetaClassName(TypeDefinition* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("TypeDefinition")) + 1);
+	name = malloc(sizeof(char) * (strlen("TypeDefinition")) + 1);
 	if(name != NULL)
 		strcpy(name, "TypeDefinition");
 	else

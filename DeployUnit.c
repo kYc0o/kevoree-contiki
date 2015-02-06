@@ -18,7 +18,7 @@ NamedElement* newPoly_DeployUnit()
 	NamedElement* pObj = new_NamedElement();
 
 	/* Allocating memory */
-	pDepUnitObj = (DeployUnit*)my_malloc(sizeof(DeployUnit));
+	pDepUnitObj = (DeployUnit*)malloc(sizeof(DeployUnit));
 
 	if (pDepUnitObj == NULL)
 	{
@@ -62,7 +62,7 @@ DeployUnit* new_DeployUnit()
 		return NULL;
 
 	/* Allocating memory */
-	pDepUnitObj = (DeployUnit*)my_malloc(sizeof(DeployUnit));
+	pDepUnitObj = (DeployUnit*)malloc(sizeof(DeployUnit));
 
 	if (pDepUnitObj == NULL)
 	{
@@ -109,7 +109,7 @@ char* DeployUnit_InternalGetKey(DeployUnit* const this)
 										strlen("hashcode=") + strlen(this->hashcode) + strlen(",") +
 										strlen("name=") + strlen(this->super->name) + strlen(",") +
 										strlen("version=") + strlen(this->version)) + 1);*/
-	internalKey = my_malloc(sizeof(char) * (strlen(this->groupName) + strlen("/") +
+	internalKey = malloc(sizeof(char) * (strlen(this->groupName) + strlen("/") +
 			strlen(this->hashcode) + strlen("/") +
 			strlen(this->super->name) + strlen("/") +
 			strlen(this->version)) + 1);
@@ -126,7 +126,7 @@ char* DeployUnit_MetaClassName(DeployUnit* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("DeployUnit")) + 1);
+	name = malloc(sizeof(char) * (strlen("DeployUnit")) + 1);
 	if(name != NULL)
 		strcpy(name, "DeployUnit");
 	else

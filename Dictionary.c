@@ -14,7 +14,7 @@ Dictionary* new_Dictionary()
 {
 	Dictionary* pObj = NULL;
 	/* Allocating memory */
-	pObj = (Dictionary*)my_malloc(sizeof(Dictionary));
+	pObj = (Dictionary*)malloc(sizeof(Dictionary));
 
 	if (pObj == NULL)
 	{
@@ -97,7 +97,7 @@ void Dictionary_AddValues(Dictionary* const this, DictionaryValue* ptr)
 			/*container = (DictionaryValue*)ptr;*/
 			if(hashmap_put(this->values, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("dictionary[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("dictionary[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "dictionary[%s]", this->InternalGetKey(this));
 			}
 		}
@@ -131,7 +131,7 @@ char* Dictionary_MetaClassName(Dictionary* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("Dictionary")) + 1);
+	name = malloc(sizeof(char) * (strlen("Dictionary")) + 1);
 	if(name != NULL)
 		strcpy(name, "Dictionary");
 	else
@@ -146,7 +146,7 @@ void Dictionary_VisitAttributes(void* const this, char* parent, Visitor* visitor
 	char *cClass = NULL;
 	memset(&path[0], 0, sizeof(path));
 
-	cClass = my_malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((Dictionary*)this)->MetaClassName((Dictionary*)this))) + 1);
+	cClass = malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((Dictionary*)this)->MetaClassName((Dictionary*)this))) + 1);
 	sprintf(cClass, "org.kevoree.%s", ((Dictionary*)this)->MetaClassName((Dictionary*)this));
 	sprintf(path, "eClass");
 	visitor->action(path, STRING, cClass);

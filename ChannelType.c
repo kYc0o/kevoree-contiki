@@ -19,7 +19,7 @@ TypeDefinition* newPoly_ChannelType()
 		return NULL;
 
 	/* Allocating memory */
-	pChanTypeObj = (ChannelType*)my_malloc(sizeof(ChannelType));
+	pChanTypeObj = (ChannelType*)malloc(sizeof(ChannelType));
 
 	if (pChanTypeObj == NULL)
 	{
@@ -58,7 +58,7 @@ ChannelType* new_ChannelType()
 		return NULL;
 
 	/* Allocating memory */
-	pChanTypeObj = (ChannelType*)my_malloc(sizeof(ChannelType));
+	pChanTypeObj = (ChannelType*)malloc(sizeof(ChannelType));
 
 	if (pChanTypeObj == NULL)
 	{
@@ -120,7 +120,7 @@ char* ChannelType_MetaClassName(ChannelType* const this)
 {
 	char *name = NULL;
 
-	name = my_malloc(sizeof(char) * (strlen("ChannelType")) + 1);
+	name = malloc(sizeof(char) * (strlen("ChannelType")) + 1);
 	if(name != NULL)
 		strcpy(name, "ChannelType");
 	else

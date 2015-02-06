@@ -20,7 +20,7 @@ Instance* newPoly_ComponentInstance()
 	Instance* pObj = new_Instance();
 
 	/* Allocating memory */
-	pCompInstanceObj = (ComponentInstance*)my_malloc(sizeof(ComponentInstance));
+	pCompInstanceObj = (ComponentInstance*)malloc(sizeof(ComponentInstance));
 
 	if (pCompInstanceObj == NULL)
 	{
@@ -60,7 +60,7 @@ ComponentInstance* new_ComponentInstance()
 		return NULL;
 
 	/* Allocating memory */
-	pCompInstanceObj = (ComponentInstance*)my_malloc(sizeof(ComponentInstance));
+	pCompInstanceObj = (ComponentInstance*)malloc(sizeof(ComponentInstance));
 
 	if (pCompInstanceObj == NULL)
 	{
@@ -101,7 +101,7 @@ char* ComponentInstance_MetaClassName(ComponentInstance* const this)
 {
 	char *name = NULL;
 
-	name = my_malloc(sizeof(char) * (strlen("ComponentInstance")) + 1);
+	name = malloc(sizeof(char) * (strlen("ComponentInstance")) + 1);
 	if(name != NULL)
 		strcpy(name, "ComponentInstance");
 	else
@@ -184,7 +184,7 @@ void ComponentInstance_AddProvided(ComponentInstance* const this, Port* ptr)
 			/*container = (MBinding*)ptr;*/
 			if(hashmap_put(this->provided, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen(this->eContainer) + strlen("/component[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen(this->eContainer) + strlen("/component[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "%s/component[%s]", this->eContainer, this->InternalGetKey(this));
 			}
 		}
@@ -212,7 +212,7 @@ void ComponentInstance_AddRequired(ComponentInstance* const this, Port* ptr)
 			/*container = (MBinding*)ptr;*/
 			if(hashmap_put(this->required, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen(this->eContainer) + strlen("/component[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen(this->eContainer) + strlen("/component[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "%s/component[%s]", this->eContainer, this->InternalGetKey(this));
 			}
 			/*

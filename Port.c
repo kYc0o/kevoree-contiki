@@ -19,7 +19,7 @@ Port* new_Port()
 {
 	Port* pObj = NULL;
 	/* Allocating memory */
-	pObj = (Port*)my_malloc(sizeof(Port));
+	pObj = (Port*)malloc(sizeof(Port));
 
 	if (pObj == NULL)
 	{
@@ -77,7 +77,7 @@ char* Port_MetaClassName(Port* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("Port")) + 1);
+	name = malloc(sizeof(char) * (strlen("Port")) + 1);
 	if(name != NULL)
 		strcpy(name, "Port");
 	else

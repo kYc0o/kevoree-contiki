@@ -14,7 +14,7 @@ DictionaryType* new_DictionaryType()
 {
 	DictionaryType* pObj = NULL;
 	/* Allocating memory */
-	pObj = (DictionaryType*)my_malloc(sizeof(DictionaryType));
+	pObj = (DictionaryType*)malloc(sizeof(DictionaryType));
 
 	if (pObj == NULL)
 	{
@@ -65,7 +65,7 @@ char* DictionaryType_MetaClassName(DictionaryType* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("DictionaryType")) + 1);
+	name = malloc(sizeof(char) * (strlen("DictionaryType")) + 1);
 	if(name != NULL)
 		strcpy(name, "DictionaryType");
 	else
@@ -112,7 +112,7 @@ void DictionaryType_AddAttributes(DictionaryType* const this, DictionaryAttribut
 			/*container = (DictionaryAttribute*)ptr;*/
 			if(hashmap_put(this->attributes, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = my_malloc(sizeof(char) * (strlen("dictionaryType[]") + strlen(this->InternalGetKey(this))) + 1);
+				ptr->eContainer = malloc(sizeof(char) * (strlen("dictionaryType[]") + strlen(this->InternalGetKey(this))) + 1);
 				sprintf(ptr->eContainer, "dictionaryType[%s]", this->InternalGetKey(this));
 			}
 		}
@@ -143,7 +143,7 @@ void DictionaryType_VisitAttributes(void* const this, char* parent, Visitor* vis
 	char *cClass = NULL;
 	memset(&path[0], 0, sizeof(path));
 
-	cClass = my_malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((DictionaryType*)this)->MetaClassName((DictionaryType*)this))) + 1);
+	cClass = malloc(sizeof(char) * (strlen("org.kevoree.") + strlen(((DictionaryType*)this)->MetaClassName((DictionaryType*)this))) + 1);
 	sprintf(cClass, "org.kevoree.%s", ((DictionaryType*)this)->MetaClassName((DictionaryType*)this));
 	sprintf(path,"eClass", parent);
 	visitor->action(path, STRING, cClass);

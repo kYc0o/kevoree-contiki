@@ -18,7 +18,7 @@ TypeDefinition* newPoly_PortType()
 	TypeDefinition* pObj = new_TypeDefinition();
 
 	/* Allocating memory */
-	pPortTypeObj = (PortType*)my_malloc(sizeof(PortType));
+	pPortTypeObj = (PortType*)malloc(sizeof(PortType));
 
 	if (pPortTypeObj == NULL)
 	{
@@ -53,7 +53,7 @@ PortType* new_PortType()
 		return NULL;
 
 	/* Allocating memory */
-	pPortTypeObj = (PortType*)my_malloc(sizeof(PortType));
+	pPortTypeObj = (PortType*)malloc(sizeof(PortType));
 
 	if (pPortTypeObj == NULL)
 	{
@@ -81,7 +81,7 @@ char* PortType_MetaClassName(PortType* const this)
 {
 	char *name;
 
-	name = my_malloc(sizeof(char) * (strlen("PortType")) + 1);
+	name = malloc(sizeof(char) * (strlen("PortType")) + 1);
 	if(name != NULL)
 		strcpy(name, "PortType");
 	else
