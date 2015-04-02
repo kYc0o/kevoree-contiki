@@ -40,6 +40,8 @@ Instance* newPoly_ContainerNode()
 	pContNodeObj->groups = NULL;
 	pContNodeObj->networkInformation = NULL;
 	pContNodeObj->eContainer = NULL;
+	pContNodeObj->path = NULL;
+	pContNodeObj->refs = NULL;
 
 	pContNodeObj->FindComponentsByID = ContainerNode_FindComponentsByID;
 	pContNodeObj->FindHostsByID = ContainerNode_FindHostsByID;
@@ -56,8 +58,8 @@ Instance* newPoly_ContainerNode()
 	pContNodeObj->RemoveGroups = ContainerNode_RemoveGroups;
 	pContNodeObj->RemoveNetworkInformation = ContainerNode_RemoveNetworkInformation;
 
-	pObj->MetaClassName = ContainerNode_MetaClassName;
-	pObj->InternalGetKey = ContainerNode_InternalGetKey;
+	pObj->metaClassName = ContainerNode_metaClassName;
+	pObj->internalGetKey = ContainerNode_internalGetKey;
 	pObj->VisitAttributes = ContainerNode_VisitAttributes;
 	pObj->VisitPathAttributes = ContainerNode_VisitPathAttributes;
 	pObj->VisitReferences = ContainerNode_VisitReferences;
@@ -95,6 +97,8 @@ ContainerNode* new_ContainerNode()
 	pContNodeObj->groups = NULL;
 	pContNodeObj->networkInformation = NULL;
 	pContNodeObj->eContainer = NULL;
+	pContNodeObj->path = NULL;
+	pContNodeObj->refs = NULL;
 
 	pContNodeObj->FindComponentsByID = ContainerNode_FindComponentsByID;
 	pContNodeObj->FindHostsByID = ContainerNode_FindHostsByID;
@@ -111,9 +115,9 @@ ContainerNode* new_ContainerNode()
 	pContNodeObj->RemoveGroups = ContainerNode_RemoveGroups;
 	pContNodeObj->RemoveNetworkInformation = ContainerNode_RemoveNetworkInformation;
 
-	pContNodeObj->MetaClassName = ContainerNode_MetaClassName;
-	pObj->super->MetaClassName = ContainerNode_MetaClassName;
-	pContNodeObj->InternalGetKey = ContainerNode_InternalGetKey;
+	pContNodeObj->metaClassName = ContainerNode_metaClassName;
+	pObj->super->metaClassName = ContainerNode_metaClassName;
+	pContNodeObj->internalGetKey = ContainerNode_internalGetKey;
 	pContNodeObj->VisitAttributes = ContainerNode_VisitAttributes;
 	pContNodeObj->VisitPathAttributes = ContainerNode_VisitPathAttributes;
 	pContNodeObj->VisitReferences = ContainerNode_VisitReferences;
@@ -125,13 +129,15 @@ ContainerNode* new_ContainerNode()
 	return pContNodeObj;
 }
 
-char* ContainerNode_InternalGetKey(ContainerNode* const this)
+char* ContainerNode_internalGetKey(void* const this)
 {
-	return this->super->InternalGetKey(this->super);
+	ContainerNode *pObj = (ContainerNode*)this;
+	return pObj->super->internalGetKey(pObj->super);
 }
 
-char* ContainerNode_MetaClassName(ContainerNode* const this)
+char* ContainerNode_metaClassName(void* const this)
 {
+	ContainerNode *pObj = (ContainerNode*)this;
 	char *name;
 
 	name = malloc(sizeof(char) * (strlen("ContainerNode")) + 1);
@@ -217,9 +223,12 @@ NetworkInfo* ContainerNode_FindNetworkInformationByID(ContainerNode* const this,
 
 void ContainerNode_AddComponents(ContainerNode* const this, ComponentInstance* ptr)
 {
+	/*
+	 * Is containment
+	 */
 	ComponentInstance* container = NULL;
 
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -237,8 +246,12 @@ void ContainerNode_AddComponents(ContainerNode* const this, ComponentInstance* p
 			/*container = (ComponentInstance*)ptr;*/
 			if(hashmap_put(this->components, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = malloc(sizeof(char) * (strlen("node[]") + strlen(this->InternalGetKey(this))) + 1);
-				sprintf(ptr->eContainer, "node[%s]", this->InternalGetKey(this));
+				ptr->eContainer = malloc(sizeof(char) * (strlen(this->path)) + 1);
+				strcpy(ptr->eContainer, this->path);
+				ptr->super->eContainer = ptr->eContainer;
+				ptr->path = malloc(sizeof(char) * (strlen(this->path) + strlen("/components[]") + strlen(internalKey)) + 1);
+				sprintf(ptr->path, "%s/components[%s]", this->path, internalKey);
+				ptr->super->path = ptr->path;
 			}
 		}
 	}
@@ -246,9 +259,12 @@ void ContainerNode_AddComponents(ContainerNode* const this, ComponentInstance* p
 
 void ContainerNode_AddHosts(ContainerNode* const this, ContainerNode* ptr)
 {
+	/*
+	 * Is reference
+	 */
 	ContainerNode* container = NULL;
 
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -258,26 +274,68 @@ void ContainerNode_AddHosts(ContainerNode* const this, ContainerNode* ptr)
 	{
 		if(this->hosts == NULL)
 		{
+			/*
+			 * TODO if == NULL
+			 */
 			this->hosts = hashmap_new();
 		}
 		if(hashmap_get(this->hosts, internalKey, (void**)(&container)) == MAP_MISSING)
 		{
 			/*container = (ContainerNode*)ptr;*/
-			hashmap_put(this->hosts, internalKey, ptr);
+			if ((hashmap_put(this->hosts, internalKey, ptr)) == MAP_OK) {
+				/*if (ptr->refs == NULL) {
+					if ((ptr->refs = hashmap_new()) == MAP_OK) {
+						PRINTF("INFO: hosts references created successfully!\n");
+					} else {
+						PRINTF("ERROR: hosts references cannot be created!\n");
+					}
+				}
+				if (ptr->refs != NULL) {
+					char *ref = malloc(sizeof(char) * (strlen("node[]") + strlen(this->internalGetKey(this))) + 1);
+					sprintf(ref, "node[%s]", this->internalGetKey(this));
+					if ((hashmap_put(ptr->refs, this->internalGetKey(this), (void**)&ref)) == MAP_OK) {
+						PRINTF("INFO: hosts reference added successfully!\n");
+					} else {
+						PRINTF("ERROR: hosts reference cannot be added!\n");
+					}
+				}*/
+			}
 		}
 	}
 }
 
 void ContainerNode_AddHost(ContainerNode* const this, ContainerNode* ptr)
 {
+	/*
+	 * Is reference
+	 */
 	this->host = ptr;
+	/*if (ptr->refs == NULL) {
+		if ((ptr->refs = hashmap_new()) == MAP_OK) {
+			PRINTF("INFO: hosts references created successfully!\n");
+		} else {
+			PRINTF("ERROR: hosts references cannot be created!\n");
+		}
+	}
+	if (ptr->refs != NULL) {
+		char *ref = malloc(sizeof(char) * (strlen("node[]") + strlen(this->internalGetKey(this))) + 1);
+		sprintf(ref, "node[%s]", this->internalGetKey(this));
+		if ((hashmap_put(ptr->refs, this->internalGetKey(this), (void**)&ref)) == MAP_OK) {
+			PRINTF("INFO: hosts reference added successfully!\n");
+		} else {
+			PRINTF("ERROR: hosts reference cannot be added!\n");
+		}
+	}*/
 }
 
 void ContainerNode_AddGroups(ContainerNode* const this, Group* ptr)
 {
+	/*
+	 * Is reference
+	 */
 	Group* container = NULL;
 
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -291,8 +349,26 @@ void ContainerNode_AddGroups(ContainerNode* const this, Group* ptr)
 		}
 		if(hashmap_get(this->groups, internalKey, (void**)(&container)) == MAP_MISSING)
 		{
-			/*container = (Group*)ptr;*/
-			hashmap_put(this->groups, internalKey, ptr);
+			if ((hashmap_put(this->groups, internalKey, ptr)) == MAP_OK) {
+				/*if (ptr->refs == NULL) {
+					if ((ptr->refs = hashmap_new()) == MAP_OK) {
+						PRINTF("INFO: group references created successfully!\n");
+					} else {
+						PRINTF("ERROR: group references cannot be created!\n");
+					}
+				}
+				if (ptr->refs != NULL) {
+					char *ref = malloc(sizeof(char) * (strlen("node[]") + strlen(this->internalGetKey(this))) + 1);
+					sprintf(ref, "node[%s]", this->internalGetKey(this));
+					char *key = malloc(sizeof(char) * (strlen(ref) + strlen("/groups[]") + strlen(internalKey)) + 1);
+					sprintf(key, "%s/groups[%s]", ref, internalKey);
+					if ((hashmap_put(ptr->refs, key, (void**)&ref)) == MAP_OK) {
+						PRINTF("INFO: group reference added successfully!\n");
+					} else {
+						PRINTF("ERROR: group reference cannot be added!\n");
+					}
+				}*/
+			}
 		}
 	}
 }
@@ -301,7 +377,7 @@ void ContainerNode_AddNetworkInformation(ContainerNode* const this, NetworkInfo*
 {
 	NetworkInfo* container = NULL;
 
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -318,8 +394,10 @@ void ContainerNode_AddNetworkInformation(ContainerNode* const this, NetworkInfo*
 			/*container = (NetworkInfo*)ptr;*/
 			if(hashmap_put(this->networkInformation, internalKey, ptr) == 0)
 			{
-				ptr->eContainer = malloc(sizeof(char) * (strlen("node[]") + strlen(this->InternalGetKey(this))) + 1);
-				sprintf(ptr->eContainer, "node[%s]", this->InternalGetKey(this));
+				ptr->eContainer = malloc(sizeof(char) * (strlen(this->path)) + 1);
+				strcpy(ptr->eContainer, this->path);
+				ptr->path = malloc(sizeof(char) * (strlen(this->path) +	strlen("/networkInformation[]") + strlen(internalKey)) + 1);
+				sprintf(ptr->path, "%s/networkInformation[%s]", this->path, this->internalGetKey(this), internalKey);
 			}
 		}
 	}
@@ -327,7 +405,7 @@ void ContainerNode_AddNetworkInformation(ContainerNode* const this, NetworkInfo*
 
 void ContainerNode_RemoveComponents(ContainerNode* const this, ComponentInstance* ptr)
 {
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -337,15 +415,17 @@ void ContainerNode_RemoveComponents(ContainerNode* const this, ComponentInstance
 	{
 		if(hashmap_remove(this->components, internalKey) == MAP_OK)
 		{
+			free(ptr->eContainer);
 			ptr->eContainer = NULL;
-			free(internalKey);
+			free(ptr->path);
+			ptr->path = NULL;
 		}
 	}
 }
 
 void ContainerNode_RemoveHosts(ContainerNode* const this, ContainerNode* ptr)
 {
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -353,20 +433,31 @@ void ContainerNode_RemoveHosts(ContainerNode* const this, ContainerNode* ptr)
 	}
 	else
 	{
-		hashmap_remove(this->hosts, internalKey);
-		free(internalKey);
+		if ((hashmap_remove(this->hosts, internalKey)) == MAP_OK) {
+			/*if ((hashmap_remove(ptr->refs, this->path)) == MAP_OK) {
+				PRINTF("INFO: hosts reference removed\n");
+			} else {
+				PRINTF("INFO: cannot remove hosts reference\n");
+			}*/
+		}
 	}
 }
 
 void ContainerNode_RemoveHost(ContainerNode* const this, ContainerNode* ptr)
 {
-	free(ptr);
-	ptr = NULL;
+	this->host = NULL;
+	if ((hashmap_remove(this->hosts, ptr->internalGetKey(ptr))) == MAP_OK) {
+		/*if ((hashmap_remove(ptr->refs, this->path)) == MAP_OK) {
+			PRINTF("INFO: host reference removed\n");
+		} else {
+			PRINTF("INFO: cannot remove host reference\n");
+		}*/
+	}
 }
 
 void ContainerNode_RemoveGroups(ContainerNode* const this, Group* ptr)
 {
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -374,14 +465,19 @@ void ContainerNode_RemoveGroups(ContainerNode* const this, Group* ptr)
 	}
 	else
 	{
-		hashmap_remove(this->groups, internalKey);
-		free(internalKey);
+		if ((hashmap_remove(this->groups, internalKey)) == MAP_OK) {
+			/*if ((hashmap_remove(ptr->refs, this->path)) == MAP_OK) {
+				PRINTF("INFO: groups reference removed\n");
+			} else {
+				PRINTF("ERROR: cannot remove groups reference\n");
+			}*/
+		}
 	}
 }
 
 void ContainerNode_RemoveNetworkInformation(ContainerNode* const this, NetworkInfo* ptr)
 {
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -391,17 +487,24 @@ void ContainerNode_RemoveNetworkInformation(ContainerNode* const this, NetworkIn
 	{
 		if(hashmap_remove(this->networkInformation, internalKey) == MAP_OK)
 		{
+			free(ptr->eContainer);
 			ptr->eContainer = NULL;
-			free(internalKey);
+			free(ptr->path);
+			ptr->path = NULL;
 		}
 	}
 }
 
-void deletePoly_ContainerNode(Instance* const this)
+void deletePoly_ContainerNode(void* const this)
 {
+	Instance *pObj = (Instance*)this;
 	ContainerNode* pContNodeObj;
-	pContNodeObj = this->pDerivedObj;
+	pContNodeObj = pObj->pDerivedObj;
 	/*destroy derived obj*/
+	/*
+	 * TODO Check for NULLity
+	 * TODO fix polymorphism
+	 */
 	hashmap_free(pContNodeObj->components);
 	hashmap_free(pContNodeObj->hosts);
 	hashmap_free(pContNodeObj->groups);
@@ -413,18 +516,23 @@ void deletePoly_ContainerNode(Instance* const this)
 	delete_Instance(this);
 }
 
-void delete_ContainerNode(ContainerNode* const this)
+void delete_ContainerNode(void* const this)
 {
 	if(this != NULL)
-	{/* destroy base object */
-		delete_Instance(this->super);
+	{
+		ContainerNode *pObj = (ContainerNode*)this;
+		/* destroy base object */
+		delete_Instance(pObj->super);
 		/* destroy data memebers */
-		hashmap_free(this->components);
-		hashmap_free(this->hosts);
-		hashmap_free(this->groups);
-		hashmap_free(this->networkInformation);
-		free(this->host);
-		free(this->eContainer);
+		/*
+		 * TODO check NULLity
+		 */
+		hashmap_free(pObj->components);
+		hashmap_free(pObj->hosts);
+		hashmap_free(pObj->groups);
+		hashmap_free(pObj->networkInformation);
+		free(pObj->host);
+		free(pObj->eContainer);
 		free(this);
 		/*this = NULL;*/
 	}
@@ -432,16 +540,25 @@ void delete_ContainerNode(ContainerNode* const this)
 
 void ContainerNode_VisitAttributes(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
+	/*
+	 * TODO create "this" object type
+	 */
 	Instance_VisitAttributes(((ContainerNode*)(this))->super, parent, visitor, recursive);
 }
 
 void ContainerNode_VisitPathAttributes(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
+	/*
+	 * TODO create "this" object type
+	 */
 	Instance_VisitPathAttributes(((ContainerNode*)(this))->super, parent, visitor, recursive);
 }
 
-void ContainerNode_VisitReferences(void *const this, char *parent, Visitor *visitor)
+void ContainerNode_VisitReferences(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
+	/*
+	 * TODO create "this" object type
+	 */
 	char path[256];
 	memset(&path[0], 0, sizeof(path));
 
@@ -462,8 +579,8 @@ void ContainerNode_VisitReferences(void *const this, char *parent, Visitor *visi
 				visitor->action(NULL, BRACKET, NULL);
 				any_t data = (any_t) (m->data[i].data);
 				ComponentInstance* n = data;
-				n->VisitAttributes(n, path, visitor);
-				n->VisitReferences(n, path, visitor);
+				n->VisitAttributes(n, path, visitor, true);
+				n->VisitReferences(n, path, visitor, true);
 				if(length > 1)
 				{
 					visitor->action(NULL, CLOSEBRACKETCOLON, NULL);
@@ -519,7 +636,7 @@ void ContainerNode_VisitReferences(void *const this, char *parent, Visitor *visi
 	if(((ContainerNode*)(this))->host != NULL)
 	{
 		visitor->action("host", SQBRACKET, NULL);
-		sprintf(path, "%s/host[%s]", parent, ((ContainerNode*)(this))->host->InternalGetKey(((ContainerNode*)(this))->host));
+		sprintf(path, "%s/host[%s]", parent, ((ContainerNode*)(this))->host->internalGetKey(((ContainerNode*)(this))->host));
 		((ContainerNode*)(this))->host->VisitAttributes(((ContainerNode*)(this))->host, path, visitor, false);
 		visitor->action(NULL, CLOSESQBRACKETCOLON, NULL);
 	}
@@ -545,7 +662,7 @@ void ContainerNode_VisitReferences(void *const this, char *parent, Visitor *visi
 			{
 				any_t data = (any_t) (m->data[i].data);
 				Group* n = data;
-				sprintf(path, "groups[%s]", n->InternalGetKey(n));
+				sprintf(path, "groups[%s]", n->internalGetKey(n));
 				visitor->action(path, STRREF, NULL);
 				if(length > 1)
 				{
@@ -581,8 +698,8 @@ void ContainerNode_VisitReferences(void *const this, char *parent, Visitor *visi
 				visitor->action(NULL, BRACKET, NULL);
 				any_t data = (any_t) (m->data[i].data);
 				NetworkInfo* n = data;
-				n->VisitAttributes(n, path, visitor);
-				n->VisitReferences(n, path, visitor);
+				n->VisitAttributes(n, path, visitor, true);
+				n->VisitReferences(n, path, visitor, true);
 				if(length > 1)
 				{
 					visitor->action(NULL, CLOSEBRACKETCOLON, NULL);
@@ -604,8 +721,11 @@ void ContainerNode_VisitReferences(void *const this, char *parent, Visitor *visi
 
 }
 
-void ContainerNode_VisitPathReferences(void *const this, char *parent, Visitor *visitor)
+void ContainerNode_VisitPathReferences(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
+	/*
+	 * TODO create "this" object type
+	 */
 	char path[256];
 	memset(&path[0], 0, sizeof(path));
 
@@ -625,9 +745,16 @@ void ContainerNode_VisitPathReferences(void *const this, char *parent, Visitor *
 			{
 				any_t data = (any_t) (m->data[i].data);
 				ComponentInstance* n = data;
-				sprintf(path,"%s/components[%s]", parent, n->InternalGetKey(n));
-				n->VisitPathAttributes(n, path, visitor);
-				n->VisitPathReferences(n, path, visitor);
+				sprintf(path,"%s/components[%s]", parent, n->internalGetKey(n));
+				if (visitor->secondAction != NULL) {
+					if (visitor->secondAction(path, "components")) {
+						n->VisitPathAttributes(n, path, visitor, true);
+						n->VisitPathReferences(n, path, visitor, true);
+					}
+				} else {
+					n->VisitPathAttributes(n, path, visitor, true);
+					n->VisitPathReferences(n, path, visitor, true);
+				}
 			}
 		}
 	}
@@ -646,16 +773,18 @@ void ContainerNode_VisitPathReferences(void *const this, char *parent, Visitor *
 			{
 				any_t data = (any_t) (m->data[i].data);
 				ContainerNode* n = data;
-				sprintf(path,"%s/hosts[%s]", parent, n->InternalGetKey(n));
-				n->VisitPathAttributes(n, path, visitor, false);
+				sprintf(path,"%s/%s\\hosts", parent, n->path);
+				/*n->VisitPathAttributes(n, path, visitor, false);*/
+				visitor->action(path, REFERENCE, parent);
 			}
 		}
 	}
 
 	if(((ContainerNode*)(this))->host != NULL)
 	{
-		sprintf(path, "%s/host[%s]", parent, ((ContainerNode*)(this))->host->InternalGetKey(((ContainerNode*)(this))->host));
-		((ContainerNode*)(this))->host->VisitPathAttributes(((ContainerNode*)(this))->host, path, visitor, false);
+		sprintf(path, "%s/%s\\host", parent, ((ContainerNode*)(this))->host->path);
+		/*((ContainerNode*)(this))->host->VisitPathAttributes(((ContainerNode*)(this))->host, path, visitor, false);*/
+		visitor->action(path, REFERENCE, parent);
 	}
 
 	if(((ContainerNode*)(this))->groups != NULL)
@@ -672,8 +801,9 @@ void ContainerNode_VisitPathReferences(void *const this, char *parent, Visitor *
 			{
 				any_t data = (any_t) (m->data[i].data);
 				Group* n = data;
-				sprintf(path, "%s/groups[%s]", parent, n->InternalGetKey(n));
-				n->VisitPathAttributes(n, path, visitor, false);
+				sprintf(path, "%s/%s\\groups", parent, n->path);
+				/*n->VisitPathAttributes(n, path, visitor, false);*/
+				visitor->action(path, REFERENCE, parent);
 			}
 		}
 	}
@@ -692,22 +822,30 @@ void ContainerNode_VisitPathReferences(void *const this, char *parent, Visitor *
 			{
 				any_t data = (any_t) (m->data[i].data);
 				NetworkInfo* n = data;
-				sprintf(path,"%s/networkInformation[%s]", parent, n->InternalGetKey(n));
-				n->VisitPathAttributes(n, path, visitor);
-				n->VisitPathReferences(n, path, visitor);
+				sprintf(path,"%s/networkInformation[%s]", parent, n->internalGetKey(n));
+				if (visitor->secondAction != NULL) {
+					if (visitor->secondAction(path, "networkInformation")) {
+						n->VisitPathAttributes(n, path, visitor, true);
+						n->VisitPathReferences(n, path, visitor, true);
+					}
+				} else {
+					n->VisitPathAttributes(n, path, visitor, true);
+					n->VisitPathReferences(n, path, visitor, true);
+				}
 			}
 		}
 	}
 }
 
-void* ContainerNode_FindByPath(char* attribute, ContainerNode* const this)
+void* ContainerNode_FindByPath(char* attribute, void* const this)
 {
+	ContainerNode *pObj = (ContainerNode*)this;
 	/* There is no local attributes */
 
 	/* Instance attributes and references */
 	if(!strcmp("name", attribute) ||  !strcmp("metaData", attribute) || !strcmp("started", attribute))
 	{
-		return Instance_FindByPath(attribute, this->super);
+		return Instance_FindByPath(attribute, pObj->super);
 	}
 	/* Local references */
 	else
@@ -755,17 +893,36 @@ void* ContainerNode_FindByPath(char* attribute, ContainerNode* const this)
 			}
 			else
 			{
-				nextAttribute = strtok(NULL, "\\");
-				strcpy(nextPath, ++nextAttribute);
-				PRINTF("Next Path: %s\n", nextPath);
-				nextAttribute = NULL;
+				nextAttribute = strtok(path, "]");
+				bool isFirst = true;
+				char *fragPath = NULL;
+				while ((fragPath = strtok(NULL, "]")) != NULL) {
+					PRINTF("Attribute: %s]\n", fragPath);
+					if (isFirst) {
+						sprintf(nextPath, "%s]", ++fragPath);
+						isFirst = false;
+					} else {
+						sprintf(nextPath, "%s/%s]", nextPath, ++fragPath);
+					}
+					PRINTF("Next Path: %s\n", nextPath);
+				}
+				if (strlen(nextPath) == 0) {
+					PRINTF("Attribute: NULL\n");
+					PRINTF("Next Path: NULL\n");
+					nextAttribute = NULL;
+				}
 			}
 		}
 		else
 		{
-			nextAttribute = strtok(path, "\\");
-			nextAttribute = strtok(NULL, "\\");
-			PRINTF("Attribute: %s\n", nextAttribute);
+			if ((nextAttribute = strtok(path, "\\")) != NULL) {
+				if ((nextAttribute = strtok(NULL, "\\")) != NULL) {
+					PRINTF("Attribute: %s\n", nextAttribute);
+				} else {
+					nextAttribute = strtok(path, "\\");
+					PRINTF("Attribute: %s\n", nextAttribute);
+				}
+			}
 		}
 
 		if(!strcmp("components", obj))
@@ -773,12 +930,12 @@ void* ContainerNode_FindByPath(char* attribute, ContainerNode* const this)
 			if(nextAttribute == NULL)
 			{
 				free(obj);
-				return this->FindComponentsByID(this, key);
+				return pObj->FindComponentsByID(pObj, key);
 			}
 			else
 			{
 				free(obj);
-				ComponentInstance* compins = this->FindComponentsByID(this, key);
+				ComponentInstance* compins = pObj->FindComponentsByID(pObj, key);
 				if(compins != NULL)
 					return compins->FindByPath(nextPath, compins);
 				else
@@ -790,12 +947,12 @@ void* ContainerNode_FindByPath(char* attribute, ContainerNode* const this)
 			if(nextAttribute == NULL)
 			{
 				free(obj);
-				return this->FindHostsByID(this, key);
+				return pObj->FindHostsByID(pObj, key);
 			}
 			else
 			{
 				free(obj);
-				ContainerNode* contnode = this->FindHostsByID(this, key);
+				ContainerNode* contnode = pObj->FindHostsByID(pObj, key);
 				if(contnode != NULL)
 					return contnode->FindByPath(nextPath, contnode);
 				else
@@ -807,11 +964,11 @@ void* ContainerNode_FindByPath(char* attribute, ContainerNode* const this)
 			free(obj);
 			if(nextAttribute == NULL)
 			{
-				return this->host;
+				return pObj->host;
 			}
 			else
 			{
-				return this->host->FindByPath(nextPath, this->host);
+				return pObj->host->FindByPath(nextPath, pObj->host);
 			}
 		}
 		else if(!strcmp("networkInformation", obj))
@@ -819,11 +976,11 @@ void* ContainerNode_FindByPath(char* attribute, ContainerNode* const this)
 			free(obj);
 			if(nextAttribute == NULL)
 			{
-				return this->FindNetworkInformationByID(this, key);
+				return pObj->FindNetworkInformationByID(pObj, key);
 			}
 			else
 			{
-				NetworkInfo* netinfo = this->FindNetworkInformationByID(this, key);
+				NetworkInfo* netinfo = pObj->FindNetworkInformationByID(pObj, key);
 				if(netinfo != NULL)
 					return netinfo->FindByPath(nextPath, netinfo);
 				else
@@ -835,11 +992,11 @@ void* ContainerNode_FindByPath(char* attribute, ContainerNode* const this)
 			free(obj);
 			if(nextAttribute == NULL)
 			{
-				return this->FindGroupsByID(this, key);
+				return pObj->FindGroupsByID(pObj, key);
 			}
 			else
 			{
-				Group* group = this->FindGroupsByID(this, key);
+				Group* group = pObj->FindGroupsByID(pObj, key);
 				if(group != NULL)
 					return group->FindByPath(nextPath, group);
 				else
@@ -850,7 +1007,7 @@ void* ContainerNode_FindByPath(char* attribute, ContainerNode* const this)
 		else
 		{
 			free(obj);
-			return Instance_FindByPath(attribute, this->super);
+			return Instance_FindByPath(attribute, pObj->super);
 		}
 	}
 }

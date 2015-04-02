@@ -42,9 +42,9 @@ Port* new_Port()
 	pObj->RemoveBindings = Port_RemoveBindings;
 	pObj->RemovePortTypeRef = Port_RemovePortTypeRef;
 
-	pObj->InternalGetKey = Port_InternalGetKey;
-	pObj->MetaClassName = Port_MetaClassName;
-	pObj->super->MetaClassName = Port_MetaClassName;
+	pObj->internalGetKey = Port_internalGetKey;
+	pObj->metaClassName = Port_metaClassName;
+	pObj->super->metaClassName = Port_metaClassName;
 	pObj->Delete = delete_Port;
 	pObj->VisitAttributes = Port_VisitAttributes;
 	pObj->VisitPathAttributes = Port_VisitPathAttributes;
@@ -68,12 +68,13 @@ void delete_Port(void* this)
 	}
 }
 
-char* Port_InternalGetKey(Port* const this)
+char* Port_internalGetKey(void * const this)
 {
-	return this->super->InternalGetKey(this->super);
+	Port *pObj = (Port*)this;
+	return pObj->super->internalGetKey(pObj->super);
 }
 
-char* Port_MetaClassName(Port* const this)
+char* Port_metaClassName(void * const this)
 {
 	char *name;
 
@@ -107,7 +108,7 @@ void Port_AddBindings(Port* const this, MBinding* ptr)
 {
 	MBinding* container = NULL;
 
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -122,7 +123,6 @@ void Port_AddBindings(Port* const this, MBinding* ptr)
 
 		if(hashmap_get(this->bindings, internalKey, (void**)(&container)) == MAP_MISSING)
 		{
-			/*container = (MBinding*)ptr;*/
 			hashmap_put(this->bindings, internalKey, ptr);
 		}
 	}
@@ -135,7 +135,7 @@ void Port_AddPortTypeRef(Port* const this, PortTypeRef* ptr)
 
 void Port_RemoveBindings(Port* const this, MBinding* ptr)
 {
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -154,27 +154,30 @@ void Port_RemovePortTypeRef(Port* const this, PortTypeRef* ptr)
 	this->portTypeRef = NULL;
 }
 
-void Port_VisitAttributes(Port *const this, char *parent, Visitor *visitor, bool recursive)
+void Port_VisitAttributes(void * const this, char *parent, Visitor *visitor, bool recursive)
 {
-	NamedElement_VisitAttributes(this->super, parent, visitor, recursive);
+	Port *pObj = (Port*)this;
+	NamedElement_VisitAttributes(pObj->super, parent, visitor, recursive);
 }
 
-void Port_VisitPathAttributes(Port *const this, char *parent, Visitor *visitor, bool recursive)
+void Port_VisitPathAttributes(void * const this, char *parent, Visitor *visitor, bool recursive)
 {
-	NamedElement_VisitPathAttributes(this->super, parent, visitor, recursive);
+	Port *pObj = (Port*)this;
+	NamedElement_VisitPathAttributes(pObj->super, parent, visitor, recursive);
 }
 
-void Port_VisitReferences(Port *const this, char *parent, Visitor *visitor)
+void Port_VisitReferences(void * const this, char *parent, Visitor *visitor, bool recursive)
 {
+	Port *pObj = (Port*)this;
 	char path[256];
 	memset(&path[0], 0, sizeof(path));
 
 	hashmap_map* m = NULL;
 
-	if((m = (hashmap_map*)this->bindings) != NULL)
+	if((m = (hashmap_map*)pObj->bindings) != NULL)
 	{
 		int i;
-		int length = hashmap_length(this->bindings);
+		int length = hashmap_length(pObj->bindings);
 
 		visitor->action("bindings", SQBRACKET, NULL);
 		for(i = 0; i< m->table_size; i++)
@@ -183,7 +186,7 @@ void Port_VisitReferences(Port *const this, char *parent, Visitor *visitor)
 			{
 				any_t data = (any_t) (m->data[i].data);
 				MBinding* n = data;
-				sprintf(path, "mBindings[%s]", n->InternalGetKey(n));
+				sprintf(path, "mBindings[%s]", n->internalGetKey(n));
 				visitor->action(path, STRREF, NULL);
 				if(length > 1)
 				{
@@ -202,12 +205,12 @@ void Port_VisitReferences(Port *const this, char *parent, Visitor *visitor)
 		visitor->action(NULL, CLOSESQBRACKETCOLON, NULL);
 	}
 
-	if(this->portTypeRef != NULL)
+	if(pObj->portTypeRef != NULL)
 	{
 		visitor->action("portTypeRef", SQBRACKET, NULL);
-		sprintf(path, "%s/%s[%s]", this->portTypeRef->eContainer,
+		sprintf(path, "%s/%s[%s]", pObj->portTypeRef->eContainer,
 				parent,
-				this->portTypeRef->InternalGetKey(this->portTypeRef));
+				pObj->portTypeRef->internalGetKey(pObj->portTypeRef));
 		visitor->action(path, STRREF, NULL);
 		visitor->action(NULL, RETURN, NULL);
 		visitor->action(NULL, CLOSESQBRACKET, NULL);
@@ -219,15 +222,16 @@ void Port_VisitReferences(Port *const this, char *parent, Visitor *visitor)
 	}
 }
 
-void Port_VisitPathReferences(Port *const this, char *parent, Visitor *visitor)
+void Port_VisitPathReferences(void * const this, char *parent, Visitor *visitor, bool recursive)
 {
+	Port *pObj = (Port*)this;
 	int i;
 	char path[256];
 	memset(&path[0], 0, sizeof(path));
 
 	hashmap_map* m = NULL;
 
-	if((m = (hashmap_map*)this->bindings) != NULL)
+	if((m = (hashmap_map*)pObj->bindings) != NULL)
 	{
 		for(i = 0; i< m->table_size; i++)
 		{
@@ -235,25 +239,26 @@ void Port_VisitPathReferences(Port *const this, char *parent, Visitor *visitor)
 			{
 				any_t data = (any_t) (m->data[i].data);
 				MBinding* n = data;
-				sprintf(path, "%s/bindings[%s]", parent, n->InternalGetKey(n));
-				n->VisitPathAttributes(n, path, visitor, false);
+				sprintf(path, "%s/%s\\bindings", parent, n->path);
+				visitor->action(path, REFERENCE, parent);
 			}
 		}
 	}
 
-	if(this->portTypeRef != NULL)
+	if(pObj->portTypeRef != NULL)
 	{
-		sprintf(path, "%s/portTypeRef[%s]", parent, this->portTypeRef->InternalGetKey(this->portTypeRef));
-		this->portTypeRef->VisitPathAttributes(this->portTypeRef, path, visitor, false);
+		sprintf(path, "%s/%s\\portTypeRef", parent, pObj->portTypeRef->path);
+		visitor->action(path, REFERENCE, parent);
 	}
 }
 
-void* Port_FindByPath(char* attribute, Port* const this)
+void* Port_FindByPath(char* attribute, void * const this)
 {
+	Port * pObj = (Port*)this;
 	/* NamedElement attributes */
 	if(!strcmp("name", attribute))
 	{
-		return this->super->FindByPath(attribute, this->super);
+		return pObj->super->FindByPath(attribute, pObj->super);
 	}
 	/* Local references */
 	else
@@ -301,17 +306,36 @@ void* Port_FindByPath(char* attribute, Port* const this)
 			}
 			else
 			{
-				nextAttribute = strtok(NULL, "\\");
-				strcpy(nextPath, ++nextAttribute);
-				PRINTF("Next Path: %s\n", nextPath);
-				nextAttribute = NULL;
+				nextAttribute = strtok(path, "]");
+				bool isFirst = true;
+				char *fragPath = NULL;
+				while ((fragPath = strtok(NULL, "]")) != NULL) {
+					PRINTF("Attribute: %s]\n", fragPath);
+					if (isFirst) {
+						sprintf(nextPath, "%s]", ++fragPath);
+						isFirst = false;
+					} else {
+						sprintf(nextPath, "%s/%s]", nextPath, ++fragPath);
+					}
+					PRINTF("Next Path: %s\n", nextPath);
+				}
+				if (strlen(nextPath) == 0) {
+					PRINTF("Attribute: NULL\n");
+					PRINTF("Next Path: NULL\n");
+					nextAttribute = NULL;
+				}
 			}
 		}
 		else
 		{
-			nextAttribute = strtok(path, "\\");
-			nextAttribute = strtok(NULL, "\\");
-			PRINTF("Attribute: %s\n", nextAttribute);
+			if ((nextAttribute = strtok(path, "\\")) != NULL) {
+				if ((nextAttribute = strtok(NULL, "\\")) != NULL) {
+					PRINTF("Attribute: %s\n", nextAttribute);
+				} else {
+					nextAttribute = strtok(path, "\\");
+					PRINTF("Attribute: %s\n", nextAttribute);
+				}
+			}
 		}
 
 		if(!strcmp("bindings", obj))
@@ -320,11 +344,11 @@ void* Port_FindByPath(char* attribute, Port* const this)
 			if(nextAttribute == NULL)
 			{
 
-				return this->FindBindingsByID(this, key);
+				return pObj->FindBindingsByID(pObj, key);
 			}
 			else
 			{
-				MBinding* binding = this->FindBindingsByID(this, key);
+				MBinding* binding = pObj->FindBindingsByID(pObj, key);
 				if(binding != NULL)
 					return binding->FindByPath(nextPath, binding);
 				else

@@ -1,7 +1,9 @@
 #include "Visitor.h"
 #include "ContainerRoot.h"
 #include "ModelTrace.h"
-#include "lib/list.h"
+#include "list.h"
+
+char buffer[250];
 
 Visitor *new_Visitor(ContainerRoot *new_model, ContainerRoot *current_model)
 {
@@ -33,6 +35,7 @@ void delete_Visitor(void *const this)
 	{
 		Visitor *v = this;
 		int length = list_length(v->visit_list);
+		int i;
 
 		for (i = 0; i < length; ++i) {
 			list_chop(v->visit_list);
@@ -42,75 +45,76 @@ void delete_Visitor(void *const this)
 	}
 }
 
+
 void Visitor_store(char *path, Type type, void *value)
 {
-	switch(type)
+	/*switch(type)
 	{
 	case STRING:
 		sprintf(buffer, "\"%s\" : \"%s\"", path, (char*)value);
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case STRREF:
 		sprintf(buffer, "\"%s\"", path);
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case BOOL:
 		sprintf(buffer, "\"%s\" : \"%d\"", path, (bool)value);
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case INTEGER:
 		sprintf(buffer, "\"%s\" : \"%d\"", path, (int)value);
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case BRACKET:
 		sprintf(buffer, "{\n");
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case SQBRACKET:
 		sprintf(buffer, "\"%s\" : [\n", path);
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case CLOSEBRACKET:
 		sprintf(buffer, "}\n");
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case CLOSESQBRACKET:
 		sprintf(buffer, "]\n");
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case CLOSEBRACKETCOLON:
 		sprintf(buffer, "},\n");
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case CLOSESQBRACKETCOLON:
 		sprintf(buffer, "],\n");
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case COLON:
 		sprintf(buffer, ",\n");
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
 
 	case RETURN:
 		sprintf(buffer, "\n");
-		write_to_cfs(buffer);
+		write_to_file(buffer);
 		break;
-	}
+	}*/
 }
 
 void Visitor_printPaths(char *path, Type type, void *value)
 {
-	switch(type)
+	/*switch(type)
 	{
 	case STRING:
 		printf("path = %s  value = %s\n",path,(char*)value);
@@ -132,12 +136,12 @@ void Visitor_printPaths(char *path, Type type, void *value)
 	case RETURN:
 		printf("Type non valid!\n");
 		break;
-	}
+	}*/
 }
 
 void Visitor_print(char *path, Type type, void *value)
 {
-	switch(type)
+	/*switch(type)
 	{
 	case STRING:
 		printf("\"%s\" : \"%s\"", path, (char*)value);
@@ -183,12 +187,14 @@ void Visitor_print(char *path, Type type, void *value)
 	case RETURN:
 		printf("\n");
 		break;
-	}
+	}*/
 }
 
+/*
 ModelTrace *Visitor_diff(Visitor *const this, char *path, Type type, void *value);
 
 char* buffer = NULL;
+
 
 void actionprintf(char *path, Type type, void* value)
 {
@@ -245,4 +251,8 @@ void actionprintf(char *path, Type type, void* value)
 		printf("\n");
 	}
 }
+*/
+void Visitor_diff(Visitor *const this, char *path, Type type, void *value)
+{
 
+}

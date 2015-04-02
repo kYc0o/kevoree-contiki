@@ -33,8 +33,8 @@ NodeLink* new_NodeLink()
 	pObj->zoneID = NULL;
 	pObj->networkProperties = NULL;
 
-	pObj->InternalGetKey = NodeLink_InternalGetKey;
-	pObj->MetaClassName = NodeLink_MetaClassName;
+	pObj->internalGetKey = NodeLink_internalGetKey;
+	pObj->metaClassName = NodeLink_metaClassName;
 	pObj->FindNetworkPropertiesByID = NodeLink_FindNetworkPropertiesByID;
 	pObj->AddNetworkProperties = NodeLink_AddNetworkProperties;
 	pObj->RemoveNetworkProperties = NodeLink_RemoveNetworkProperties;
@@ -48,12 +48,13 @@ NodeLink* new_NodeLink()
 	return pObj;
 }
 
-char* NodeLink_InternalGetKey(NodeLink* const this)
+char* NodeLink_internalGetKey(void * const this)
 {
-	return this->generated_KMF_ID;
+	NodeLink *pObj = (NodeLink*)this;
+	return pObj->generated_KMF_ID;
 }
 
-char* NodeLink_MetaClassName(NodeLink* const this)
+char* NodeLink_metaClassName(void * const this)
 {
 	char *name;
 
@@ -88,7 +89,7 @@ void NodeLink_AddNetworkProperties(NodeLink* const this, NetworkProperty* ptr)
 {
 	NetworkProperty* container = NULL;
 
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -105,8 +106,10 @@ void NodeLink_AddNetworkProperties(NodeLink* const this, NetworkProperty* ptr)
 			/*container = (NetworkProperty*)ptr;*/
 			if(hashmap_put(this->networkProperties, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainerNL = malloc(sizeof(char) * (strlen("nodeLink[]") + strlen(this->InternalGetKey(this))) + 1);
-				sprintf(ptr->eContainerNL, "nodeLink[%s]", this->InternalGetKey(this));
+				ptr->eContainer = malloc(sizeof(char) * (strlen(this->path)) + 1);
+				strcpy(ptr->eContainer, this->path);
+				ptr->path = malloc(sizeof(char) * (strlen(this->path) + strlen("/networkProperties[]") + strlen(internalKey)) + 1);
+				sprintf(ptr->path, "%s/networkProperties[%s]", this->path, internalKey);
 			}
 		}
 	}
@@ -114,7 +117,7 @@ void NodeLink_AddNetworkProperties(NodeLink* const this, NetworkProperty* ptr)
 
 void NodeLink_RemoveNetworkProperties(NodeLink* const this, NetworkProperty* ptr)
 {
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -124,37 +127,40 @@ void NodeLink_RemoveNetworkProperties(NodeLink* const this, NetworkProperty* ptr
 	{
 		if(hashmap_remove(this->networkProperties, internalKey) == MAP_OK)
 		{
-			ptr->eContainerNL = NULL;
-			free(internalKey);
+			free(ptr->eContainer);
+			ptr->eContainer = NULL;
+			free(ptr->path);
+			ptr->path = NULL;
 		}
 	}
 }
 
-void delete_NodeLink(NodeLink* const this)
+void delete_NodeLink(void * const this)
 {
 	/* destroy data memebers */
 	if(this != NULL)
 	{
-		free(this->networkType);
-		free(this->lastCheck);
-		free(this->zoneID);
-		free(this->generated_KMF_ID);
-		hashmap_free(this->networkProperties);
-		free(this->eContainer);
-		free(this);
+		NodeLink *pObj = (NodeLink*)this;
+		free(pObj->networkType);
+		free(pObj->lastCheck);
+		free(pObj->zoneID);
+		free(pObj->generated_KMF_ID);
+		hashmap_free(pObj->networkProperties);
+		free(pObj->eContainer);
+		free(pObj);
 	}
 }
 
-void NodeLink_VisitAttributes(void *const this, char *parent, Visitor *visitor)
+void NodeLink_VisitAttributes(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
 	char path[256];
 	char *cClass = NULL;
 	memset(&path[0], 0, sizeof(path));
 
 	sprintf(path,"%s\\cClass", parent);
-	cClass = ((NodeLink*)this)->MetaClassName((NodeLink*)this);
+	cClass = ((NodeLink*)this)->metaClassName((NodeLink*)this);
 	visitor->action(path, STRING, cClass);
-	str_free(cClass);
+	free(cClass);
 
 	sprintf(path, "%s\\ID", parent);
 	visitor->action(path, STRING, ((NodeLink*)(this))->generated_KMF_ID);
@@ -169,17 +175,17 @@ void NodeLink_VisitAttributes(void *const this, char *parent, Visitor *visitor)
 	visitor->action(path, STRING, ((NodeLink*)(this))->zoneID);
 
 	sprintf(path, "%s\\estimatedRate", parent);
-	visitor->action(path, INTEGER, ((NodeLink*)(this))->estimatedRate);
+	visitor->action(path, INTEGER, (void*)((NodeLink*)(this))->estimatedRate);
 }
 
-void NodeLink_VisitPathAttributes(void *const this, char *parent, Visitor *visitor)
+void NodeLink_VisitPathAttributes(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
 	char path[256];
 	char *cClass = NULL;
 	memset(&path[0], 0, sizeof(path));
 
 	/*sprintf(path,"%s\\cClass", parent);
-	cClass = ((NodeLink*)this)->MetaClassName((NodeLink*)this);
+	cClass = ((NodeLink*)this)->metaClassName((NodeLink*)this);
 	visitor->action(path, STRING, cClass);
 	free(cClass);*/
 
@@ -196,10 +202,10 @@ void NodeLink_VisitPathAttributes(void *const this, char *parent, Visitor *visit
 	visitor->action(path, STRING, ((NodeLink*)(this))->zoneID);
 
 	sprintf(path, "%s\\estimatedRate", parent);
-	visitor->action(path, BOOL, ((NodeLink*)(this))->estimatedRate);
+	visitor->action(path, BOOL, (void*)((NodeLink*)(this))->estimatedRate);
 }
 
-void NodeLink_VisitReferences(void *const this, char *parent, Visitor *visitor)
+void NodeLink_VisitReferences(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
 	char path[256];
 	memset(&path[0], 0, sizeof(path));
@@ -218,14 +224,14 @@ void NodeLink_VisitReferences(void *const this, char *parent, Visitor *visitor)
 			{
 				any_t data = (any_t) (m->data[i].data);
 				NetworkProperty* n = data;
-				sprintf(path,"%s/networkProperties[%s]", parent, n->InternalGetKey(n));
-				n->VisitAttributes(n, path, visitor);
+				sprintf(path,"%s/networkProperties[%s]", parent, n->internalGetKey(n));
+				n->VisitAttributes(n, path, visitor, recursive);
 			}
 		}
 	}
 }
 
-void NodeLink_VisitPathReferences(void *const this, char *parent, Visitor *visitor)
+void NodeLink_VisitPathReferences(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
 	char path[256];
 	memset(&path[0], 0, sizeof(path));
@@ -244,31 +250,32 @@ void NodeLink_VisitPathReferences(void *const this, char *parent, Visitor *visit
 			{
 				any_t data = (any_t) (m->data[i].data);
 				NetworkProperty* n = data;
-				sprintf(path,"%s/networkProperties[%s]", parent, n->InternalGetKey(n));
-				n->VisitPathAttributes(n, path, visitor);
+				sprintf(path,"%s/networkProperties[%s]", parent, n->internalGetKey(n));
+				n->VisitPathAttributes(n, path, visitor, recursive);
 			}
 		}
 	}
 }
 
-void* NodeLink_FindByPath(char* attribute, NodeLink* const this)
+void* NodeLink_FindByPath(char* attribute, void * const this)
 {
+	NodeLink *pObj = (NodeLink*)this;
 	/* Local attributes */
 	if(!strcmp("networkType", attribute))
 	{
-		return this->networkType;
+		return pObj->networkType;
 	}
 	else if(!strcmp("estimatedRate", attribute))
 	{
-		return this->estimatedRate;
+		return (void*)pObj->estimatedRate;
 	}
 	else if(!strcmp("lastCheck", attribute))
 	{
-		return this->lastCheck;
+		return pObj->lastCheck;
 	}
 	else if(!strcmp("zoneID", attribute))
 	{
-		return this->zoneID;
+		return pObj->zoneID;
 	}
 	/*else if(!strcmp("generated_KMF_ID", attribute))
 	{
@@ -320,17 +327,36 @@ void* NodeLink_FindByPath(char* attribute, NodeLink* const this)
 			}
 			else
 			{
-				nextAttribute = strtok(NULL, "\\");
-				strcpy(nextPath, ++nextAttribute);
-				PRINTF("Next Path: %s\n", nextPath);
-				nextAttribute = NULL;
+				nextAttribute = strtok(path, "]");
+				bool isFirst = true;
+				char *fragPath = NULL;
+				while ((fragPath = strtok(NULL, "]")) != NULL) {
+					PRINTF("Attribute: %s]\n", fragPath);
+					if (isFirst) {
+						sprintf(nextPath, "%s]", ++fragPath);
+						isFirst = false;
+					} else {
+						sprintf(nextPath, "%s/%s]", nextPath, ++fragPath);
+					}
+					PRINTF("Next Path: %s\n", nextPath);
+				}
+				if (strlen(nextPath) == 0) {
+					PRINTF("Attribute: NULL\n");
+					PRINTF("Next Path: NULL\n");
+					nextAttribute = NULL;
+				}
 			}
 		}
 		else
 		{
-			nextAttribute = strtok(path, "\\");
-			nextAttribute = strtok(NULL, "\\");
-			PRINTF("Attribute: %s\n", nextAttribute);
+			if ((nextAttribute = strtok(path, "\\")) != NULL) {
+				if ((nextAttribute = strtok(NULL, "\\")) != NULL) {
+					PRINTF("Attribute: %s\n", nextAttribute);
+				} else {
+					nextAttribute = strtok(path, "\\");
+					PRINTF("Attribute: %s\n", nextAttribute);
+				}
+			}
 		}
 
 		if(!strcmp("networkProperties", obj))
@@ -338,11 +364,11 @@ void* NodeLink_FindByPath(char* attribute, NodeLink* const this)
 			free(obj);
 			if(nextAttribute == NULL)
 			{
-				return this->FindNetworkPropertiesByID(this, key);
+				return pObj->FindNetworkPropertiesByID(pObj, key);
 			}
 			else
 			{
-				NetworkProperty* netprop = this->FindNetworkPropertiesByID(this, key);
+				NetworkProperty* netprop = pObj->FindNetworkPropertiesByID(pObj, key);
 				if(netprop != NULL)
 					return netprop->FindByPath(nextPath, netprop);
 				else

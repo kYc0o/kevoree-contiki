@@ -31,13 +31,14 @@ NamedElement* newPoly_NetworkInfo()
 
 	pNetInfoObj->values = NULL;
 	pNetInfoObj->eContainer = NULL;
+	pNetInfoObj->path = NULL;
 
 	pNetInfoObj->AddValues = NetworkInfo_AddValues;
 	pNetInfoObj->RemoveValues = NetworkInfo_RemoveValues;
 	pNetInfoObj->FindValuesByID = NetworkInfo_FindValuesByID;
 
-	pObj->MetaClassName = NetworkInfo_MetaClassName;
-	pObj->InternalGetKey = NetworkInfo_InternalGetKey;
+	pObj->metaClassName = NetworkInfo_metaClassName;
+	pObj->internalGetKey = NetworkInfo_internalGetKey;
 	pObj->VisitAttributes = NetworkInfo_VisitAttributes;
 	pObj->VisitPathAttributes = NetworkInfo_VisitPathAttributes;
 	pObj->VisitReferences = NetworkInfo_VisitReferences;
@@ -70,14 +71,15 @@ NetworkInfo* new_NetworkInfo()
 
 	pNetInfoObj->values = NULL;
 	pNetInfoObj->eContainer = NULL;
+	pNetInfoObj->path = NULL;
 
 	pNetInfoObj->AddValues = NetworkInfo_AddValues;
 	pNetInfoObj->RemoveValues = NetworkInfo_RemoveValues;
 	pNetInfoObj->FindValuesByID = NetworkInfo_FindValuesByID;
 
-	pNetInfoObj->MetaClassName = NetworkInfo_MetaClassName;
-	pObj->MetaClassName = NetworkInfo_MetaClassName;
-	pNetInfoObj->InternalGetKey = NetworkInfo_InternalGetKey;
+	pNetInfoObj->metaClassName = NetworkInfo_metaClassName;
+	pObj->metaClassName = NetworkInfo_metaClassName;
+	pNetInfoObj->internalGetKey = NetworkInfo_internalGetKey;
 	pNetInfoObj->VisitAttributes = NetworkInfo_VisitAttributes;
 	pNetInfoObj->VisitPathAttributes = NetworkInfo_VisitPathAttributes;
 	pNetInfoObj->VisitReferences = NetworkInfo_VisitReferences;
@@ -89,12 +91,13 @@ NetworkInfo* new_NetworkInfo()
 	return pNetInfoObj;
 }
 
-char* NetworkInfo_InternalGetKey(NetworkInfo* const this)
+char* NetworkInfo_internalGetKey(void * const this)
 {
-	return this->super->InternalGetKey(this->super);
+	NetworkInfo *pObj = (NetworkInfo*)this;
+	return pObj->super->internalGetKey(pObj->super);
 }
 
-char* NetworkInfo_MetaClassName(NetworkInfo* const this)
+char* NetworkInfo_metaClassName(void * const this)
 {
 	char *name;
 
@@ -111,7 +114,7 @@ void NetworkInfo_AddValues(NetworkInfo* const this, NetworkProperty* ptr)
 {
 	NetworkProperty* container = NULL;
 
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -125,11 +128,12 @@ void NetworkInfo_AddValues(NetworkInfo* const this, NetworkProperty* ptr)
 		}
 		if(hashmap_get(this->values, internalKey, (void**)(&container)) == MAP_MISSING)
 		{
-			/*container = (NetworkProperty*)ptr;*/
 			if(hashmap_put(this->values, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainerNI = malloc(sizeof(char) * (strlen("networkInfo[]") + strlen(this->InternalGetKey(this))) + 1);
-				sprintf(ptr->eContainerNI, "networkInfo[%s]", this->InternalGetKey(this));
+				ptr->eContainer = malloc(sizeof(char) * (strlen(this->path)) + 1);
+				strcpy(ptr->eContainer, this->path);
+				ptr->path = malloc(sizeof(char) * (strlen(this->path) + strlen("/values[]") + strlen(internalKey)) + 1);
+				sprintf(ptr->path, "%s/values[%s]", this->path, internalKey);
 			}
 		}
 	}
@@ -137,7 +141,7 @@ void NetworkInfo_AddValues(NetworkInfo* const this, NetworkProperty* ptr)
 
 void NetworkInfo_RemoveValues(NetworkInfo* const this, NetworkProperty* ptr)
 {
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -147,8 +151,10 @@ void NetworkInfo_RemoveValues(NetworkInfo* const this, NetworkProperty* ptr)
 	{
 		if(hashmap_remove(this->values, internalKey) == MAP_OK)
 		{
-			ptr->eContainerNI = NULL;
-			free(internalKey);
+			free(ptr->eContainer);
+			ptr->eContainer = NULL;
+			free(ptr->path);
+			ptr->path = NULL;
 		}
 	}
 }
@@ -170,46 +176,48 @@ NetworkProperty* NetworkInfo_FindValuesByID(NetworkInfo* const this, char* id)
 	}
 }
 
-void deletePoly_NetworkInfo(NamedElement* const this)
+void deletePoly_NetworkInfo(void * const this)
 {
 	if(this != NULL)
 	{
+		NetworkInfo *pObj = (NetworkInfo*)this;
 		NetworkInfo* pNetInfoObj;
-		pNetInfoObj = this->pDerivedObj;
+		pNetInfoObj = pObj->pDerivedObj;
 		/*destroy derived obj*/
 		hashmap_free(pNetInfoObj->values);
 		free(pNetInfoObj->eContainer);
 		free(pNetInfoObj);
 		/*destroy base Obj*/
-		delete_NamedElement(this);
+		delete_NamedElement(pObj);
 	}
 }
 
-void delete_NetworkInfo(NetworkInfo* const this)
+void delete_NetworkInfo(void * const this)
 {
 	if(this != NULL)
 	{
+		NetworkInfo *pObj = (NetworkInfo*)this;
 		/* destroy base object */
-		delete_NamedElement(this->super);
+		delete_NamedElement(pObj->super);
 		/* destroy data memebers */
-		hashmap_free(this->values);
-		free(this->eContainer);
-		free(this);
+		hashmap_free(pObj->values);
+		free(pObj->eContainer);
+		free(pObj);
 	}
 
 }
 
-void NetworkInfo_VisitAttributes(void *const this, char *parent, Visitor *visitor)
+void NetworkInfo_VisitAttributes(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
 	NamedElement_VisitAttributes(((NetworkInfo*)(this))->super, parent, visitor, true);
 }
 
-void NetworkInfo_VisitPathAttributes(void *const this, char *parent, Visitor *visitor)
+void NetworkInfo_VisitPathAttributes(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
 	NamedElement_VisitPathAttributes(((NetworkInfo*)(this))->super, parent, visitor, true);
 }
 
-void NetworkInfo_VisitReferences(void* const this, char* parent, Visitor* visitor)
+void NetworkInfo_VisitReferences(void* const this, char* parent, Visitor* visitor, bool recursive)
 {
 	char path[256];
 	memset(&path[0], 0, sizeof(path));
@@ -231,7 +239,7 @@ void NetworkInfo_VisitReferences(void* const this, char* parent, Visitor* visito
 				visitor->action(NULL, BRACKET, NULL);
 				any_t data = (any_t) (m->data[i].data);
 				NetworkProperty* n = data;
-				n->VisitAttributes(n, path, visitor);
+				n->VisitAttributes(n, path, visitor, recursive);
 				if(length > 1)
 				{
 					visitor->action(NULL, CLOSEBRACKETCOLON, NULL);
@@ -250,7 +258,7 @@ void NetworkInfo_VisitReferences(void* const this, char* parent, Visitor* visito
 	}
 }
 
-void NetworkInfo_VisitPathReferences(void *const this, char *parent, Visitor *visitor)
+void NetworkInfo_VisitPathReferences(void *const this, char *parent, Visitor *visitor, bool recursive)
 {
 	char path[256];
 	memset(&path[0], 0, sizeof(path));
@@ -269,19 +277,26 @@ void NetworkInfo_VisitPathReferences(void *const this, char *parent, Visitor *vi
 			{
 				any_t data = (any_t) (m->data[i].data);
 				NetworkProperty* n = data;
-				sprintf(path,"%s/values[%s]", parent, n->InternalGetKey(n));
-				n->VisitPathAttributes(n, path, visitor);
+				sprintf(path,"%s/values[%s]", parent, n->internalGetKey(n));
+				if (visitor->secondAction != NULL) {
+					if (visitor->secondAction(path, "values")) {
+						n->VisitPathAttributes(n, path, visitor, true);
+					}
+				} else {
+					n->VisitPathAttributes(n, path, visitor, true);
+				}
 			}
 		}
 	}
 }
 
-void* NetworkInfo_FindByPath(char* attribute, NetworkInfo* const this)
+void* NetworkInfo_FindByPath(char* attribute, void * const this)
 {
+	NetworkInfo *pObj = (NetworkInfo*)this;
 	/* NamedElement attributes */
 	if(!strcmp("name",attribute))
 	{
-		return this->super->FindByPath(attribute, this->super);
+		return pObj->super->FindByPath(attribute, pObj->super);
 	}
 	/* Local references */
 	else
@@ -329,17 +344,36 @@ void* NetworkInfo_FindByPath(char* attribute, NetworkInfo* const this)
 			}
 			else
 			{
-				nextAttribute = strtok(NULL, "\\");
-				strcpy(nextPath, ++nextAttribute);
-				PRINTF("Next Path: %s\n", nextPath);
-				nextAttribute = NULL;
+				nextAttribute = strtok(path, "]");
+				bool isFirst = true;
+				char *fragPath = NULL;
+				while ((fragPath = strtok(NULL, "]")) != NULL) {
+					PRINTF("Attribute: %s]\n", fragPath);
+					if (isFirst) {
+						sprintf(nextPath, "%s]", ++fragPath);
+						isFirst = false;
+					} else {
+						sprintf(nextPath, "%s/%s]", nextPath, ++fragPath);
+					}
+					PRINTF("Next Path: %s\n", nextPath);
+				}
+				if (strlen(nextPath) == 0) {
+					PRINTF("Attribute: NULL\n");
+					PRINTF("Next Path: NULL\n");
+					nextAttribute = NULL;
+				}
 			}
 		}
 		else
 		{
-			nextAttribute = strtok(path, "\\");
-			nextAttribute = strtok(NULL, "\\");
-			PRINTF("Attribute: %s\n", nextAttribute);
+			if ((nextAttribute = strtok(path, "\\")) != NULL) {
+				if ((nextAttribute = strtok(NULL, "\\")) != NULL) {
+					PRINTF("Attribute: %s\n", nextAttribute);
+				} else {
+					nextAttribute = strtok(path, "\\");
+					PRINTF("Attribute: %s\n", nextAttribute);
+				}
+			}
 		}
 
 		if(!strcmp("values", obj))
@@ -347,11 +381,11 @@ void* NetworkInfo_FindByPath(char* attribute, NetworkInfo* const this)
 			free(obj);
 			if(nextAttribute == NULL)
 			{
-				return this->FindValuesByID(this, key);
+				return pObj->FindValuesByID(pObj, key);
 			}
 			else
 			{
-				NetworkProperty* netprop = this->FindValuesByID(this, key);
+				NetworkProperty* netprop = pObj->FindValuesByID(pObj, key);
 				if(netprop != NULL)
 					return netprop->FindByPath(nextPath, netprop);
 				else

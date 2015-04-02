@@ -11,7 +11,7 @@ typedef void (*fptrUpdateModel)(KevoreeModelHandlerService*, ContainerRoot*);
 typedef void (*fptrGetPreviousModel)(KevoreeModelHandlerService*, ContainerRoot*);
 typedef char *(*fptrGetNodeName)(KevoreeModelHandlerService*);
 typedef bool (*fptrCheckModel)(KevoreeModelHandlerService*, ContainerRoot*);
-typedef void (*fptrDelete)(KevoreeModelHandlerService*);
+typedef void (*fptrKMHDelete)(KevoreeModelHandlerService*);
 
 typedef struct _KevoreeModelHandlerService {
 	void *pDerivedObj;
@@ -20,7 +20,7 @@ typedef struct _KevoreeModelHandlerService {
 	fptrGetPreviousModel getPreviousModels;
 	fptrGetNodeName getNodeName;
 	fptrCheckModel checkModel;
-	fptrDelete delete;
+	fptrKMHDelete delete;
 } KevoreeModelHandlerService;
 
 KevoreeModelHandlerService *new_KevoreeModelHandlerService(void);

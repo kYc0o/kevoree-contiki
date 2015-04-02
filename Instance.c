@@ -44,8 +44,8 @@ NamedElement* newPoly_Instance()
 	pInstanceObj->RemoveDictionary = Instance_RemoveDictionary;
 	pInstanceObj->RemoveFragmentDictionary = Instance_RemoveFragmentDictionary;
 
-	pObj->MetaClassName = Instance_MetaClassName;
-	pObj->InternalGetKey = Instance_InternalGetKey;
+	pObj->metaClassName = Instance_metaClassName;
+	pObj->internalGetKey = Instance_internalGetKey;
 	pObj->Delete = deletePoly_Instance;
 	pObj->VisitAttributes = Instance_VisitAttributes;
 	pObj->VisitPathAttributes = Instance_VisitPathAttributes;
@@ -87,9 +87,9 @@ Instance* new_Instance()
 	pInstanceObj->RemoveDictionary = Instance_RemoveDictionary;
 	pInstanceObj->RemoveFragmentDictionary = Instance_RemoveFragmentDictionary;
 
-	pInstanceObj->MetaClassName = Instance_MetaClassName;
-	pObj->MetaClassName = pInstanceObj->MetaClassName;
-	pInstanceObj->InternalGetKey = Instance_InternalGetKey;
+	pInstanceObj->metaClassName = Instance_metaClassName;
+	pObj->metaClassName = pInstanceObj->metaClassName;
+	pInstanceObj->internalGetKey = Instance_internalGetKey;
 	pInstanceObj->Delete = delete_Instance;
 	pInstanceObj->VisitAttributes = Instance_VisitAttributes;
 	pInstanceObj->VisitPathAttributes = Instance_VisitPathAttributes;
@@ -125,15 +125,17 @@ void Instance_AddTypeDefinition(Instance* this, TypeDefinition* ptr)
 void Instance_AddDictionary(Instance* const this, Dictionary* ptr)
 {
 	this->dictionary = ptr;
-	ptr->eContainer = malloc(sizeof(char) * (strlen("instance[]") + strlen(this->InternalGetKey(this))) + 1);
-	sprintf(ptr->eContainer, "instance[%s]", this->InternalGetKey(this));
+	ptr->eContainer = malloc(sizeof(char) * (strlen(this->path)) + 1);
+	strcpy(ptr->eContainer, this->path);
+	ptr->path = malloc(sizeof(char) * (strlen(this->path) + strlen("/dictionary[]") + strlen(ptr->internalGetKey(ptr))) + 1);
+	sprintf(ptr->path, "%s/dictionary[%s]", this->path, ptr->internalGetKey(ptr));
 }
 
 void Instance_AddFragmentDictionary(Instance* const this, FragmentDictionary* ptr)
 {
 	FragmentDictionary* container = NULL;
 
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -150,8 +152,12 @@ void Instance_AddFragmentDictionary(Instance* const this, FragmentDictionary* pt
 			/*container = (FragmentDictionary*)ptr;*/
 			if(hashmap_put(this->fragmentDictionary, internalKey, ptr) == MAP_OK)
 			{
-				ptr->eContainer = malloc(sizeof(char) * (strlen("instance[]") + strlen(this->InternalGetKey(this))) + 1);
-				sprintf(ptr->eContainer, "instance[%s]", this->InternalGetKey(this));
+				ptr->eContainer = malloc(sizeof(char) * (strlen(this->path)) + 1);
+				strcpy(ptr->eContainer, this->path);
+				ptr->super->eContainer = ptr->eContainer;
+				ptr->path = malloc(sizeof(char) * (strlen(this->path) + strlen("/fragmentDictionary[]") + strlen(internalKey)) + 1);
+				sprintf(ptr->path, "%s/fragmentDictionary[%s]", this->path, internalKey);
+				ptr->super->path = ptr->path;
 			}
 		}
 	}
@@ -159,20 +165,19 @@ void Instance_AddFragmentDictionary(Instance* const this, FragmentDictionary* pt
 
 void Instance_RemoveTypeDefinition(Instance* const this, TypeDefinition* ptr)
 {
-	free(ptr);
 	this->typeDefinition = NULL;
 }
 
 void Instance_RemoveDictionary(Instance* const this, Dictionary* ptr)
 {
+	free(ptr->eContainer);
 	ptr->eContainer = NULL;
-	free(ptr);
 	this->dictionary = NULL;
 }
 
 void Instance_RemoveFragmentDictionary(Instance* const this, FragmentDictionary* ptr)
 {
-	char *internalKey = ptr->InternalGetKey(ptr);
+	char *internalKey = ptr->internalGetKey(ptr);
 
 	if(internalKey == NULL)
 	{
@@ -184,12 +189,13 @@ void Instance_RemoveFragmentDictionary(Instance* const this, FragmentDictionary*
 	}
 }
 
-char* Instance_InternalGetKey(Instance* const this)
+char* Instance_internalGetKey(void* const this)
 {
-	return this->super->InternalGetKey(this->super);
+	Instance *pObj = (Instance*)this;
+	return pObj->super->internalGetKey(pObj->super);
 }
 
-char* Instance_MetaClassName(Instance* const this)
+char* Instance_metaClassName(void* const this)
 {
 	char *name;
 
@@ -202,30 +208,42 @@ char* Instance_MetaClassName(Instance* const this)
 	return name;
 }
 
-void deletePoly_Instance(NamedElement* const this)
+void deletePoly_Instance(void * const this)
 {
+	NamedElement *pObj = (NamedElement*)this;
 	Instance* pInstanceObj;
-	pInstanceObj = this->pDerivedObj;
+	pInstanceObj = pObj->pDerivedObj;
 	/*destroy derived obj*/
 	free(pInstanceObj->metaData);
+	/*
 	free(pInstanceObj->typeDefinition);
 	free(pInstanceObj->dictionary);
+	*/
+	/*
+	 * TODO verify NULLity
+	 */
 	hashmap_free(pInstanceObj->fragmentDictionary);
 	free(pInstanceObj);
 	/*destroy base Obj*/
-	delete_NamedElement(this);
+	delete_NamedElement(pObj);
 }
 
-void delete_Instance(Instance* const this)
+void delete_Instance(void * const this)
 {
+	Instance *pObj = (Instance*)this;
 	/* destroy base object */
-	delete_NamedElement(this->super);
+	delete_NamedElement(pObj->super);
 	/* destroy data memebers */
-	free(this->metaData);
+	free(pObj->metaData);
+	/*
 	free(this->typeDefinition);
 	free(this->dictionary);
-	hashmap_free(this->fragmentDictionary);
-	free(this);
+	*/
+	/*
+	 * TODO verify NULLity
+	 */
+	hashmap_free(pObj->fragmentDictionary);
+	free(pObj);
 
 }
 
@@ -244,7 +262,7 @@ void Instance_VisitAttributes(void *const this, char *parent, Visitor *visitor, 
 		visitor->action(path, STRING, ((Instance*)(this))->metaData);
 		visitor->action(NULL, COLON, NULL);
 
-		sprintf(path,"started", parent);
+		sprintf(path, "started");
 		visitor->action(path, BOOL, (void*)((Instance*)(this))->started);
 		visitor->action(NULL, COLON, NULL);
 	}
@@ -280,7 +298,7 @@ void Instance_VisitReferences(void *const this, char *parent, Visitor *visitor, 
 		{
 			visitor->action("typeDefinition", SQBRACKET, NULL);
 			((Instance*)(this))->typeDefinition->VisitAttributes(((Instance*)(this))->typeDefinition, path, visitor, recursive);
-			((Instance*)(this))->typeDefinition->VisitReferences(((Instance*)(this))->typeDefinition, path, visitor);
+			((Instance*)(this))->typeDefinition->VisitReferences(((Instance*)(this))->typeDefinition, path, visitor, recursive);
 			visitor->action(NULL, CLOSESQBRACKETCOLON, NULL);
 		}
 		else
@@ -293,8 +311,8 @@ void Instance_VisitReferences(void *const this, char *parent, Visitor *visitor, 
 		{
 			visitor->action("dictionary", SQBRACKET, NULL);
 			visitor->action(NULL, BRACKET, NULL);
-			((Instance*)(this))->dictionary->VisitAttributes(((Instance*)(this))->dictionary, path, visitor);
-			((Instance*)(this))->dictionary->VisitReferences(((Instance*)(this))->dictionary, path, visitor);
+			((Instance*)(this))->dictionary->VisitAttributes(((Instance*)(this))->dictionary, path, visitor, recursive);
+			((Instance*)(this))->dictionary->VisitReferences(((Instance*)(this))->dictionary, path, visitor, recursive);
 			visitor->action(NULL, CLOSEBRACKET, NULL);
 			visitor->action(NULL, CLOSESQBRACKETCOLON, NULL);
 		}
@@ -320,8 +338,8 @@ void Instance_VisitReferences(void *const this, char *parent, Visitor *visitor, 
 					visitor->action(NULL, BRACKET, NULL);
 					any_t data = (any_t) (m->data[i].data);
 					FragmentDictionary* n = data;
-					n->VisitAttributes(n, path, visitor);
-					n->VisitReferences(n, path, visitor);
+					n->VisitAttributes(n, path, visitor, recursive);
+					n->VisitReferences(n, path, visitor, recursive);
 					if(length > 1)
 					{
 						visitor->action(NULL, CLOSEBRACKETCOLON, NULL);
@@ -344,7 +362,7 @@ void Instance_VisitReferences(void *const this, char *parent, Visitor *visitor, 
 		if(((Instance*)(this))->typeDefinition != NULL)
 		{
 			visitor->action("typeDefinition", SQBRACKET, NULL);
-			sprintf(path, "typeDefinitions[%s]", ((Instance*)(this))->typeDefinition->InternalGetKey(((Instance*)(this))->typeDefinition));
+			sprintf(path, "typeDefinitions[%s]", ((Instance*)(this))->typeDefinition->internalGetKey(((Instance*)(this))->typeDefinition));
 			visitor->action(path, STRREF, NULL);
 			visitor->action(NULL, RETURN, NULL);
 			visitor->action(NULL, CLOSESQBRACKETCOLON, NULL);
@@ -359,8 +377,8 @@ void Instance_VisitReferences(void *const this, char *parent, Visitor *visitor, 
 		{
 			visitor->action("dictionary", SQBRACKET, NULL);
 			visitor->action(NULL, BRACKET, NULL);
-			((Instance*)(this))->dictionary->VisitAttributes(((Instance*)(this))->dictionary, path, visitor);
-			((Instance*)(this))->dictionary->VisitReferences(((Instance*)(this))->dictionary, path, visitor);
+			((Instance*)(this))->dictionary->VisitAttributes(((Instance*)(this))->dictionary, path, visitor, recursive);
+			((Instance*)(this))->dictionary->VisitReferences(((Instance*)(this))->dictionary, path, visitor, recursive);
 			visitor->action(NULL, CLOSEBRACKET, NULL);
 			visitor->action(NULL, CLOSESQBRACKETCOLON, NULL);
 		}
@@ -386,8 +404,8 @@ void Instance_VisitReferences(void *const this, char *parent, Visitor *visitor, 
 					visitor->action(NULL, BRACKET, NULL);
 					any_t data = (any_t) (m->data[i].data);
 					FragmentDictionary* n = data;
-					n->VisitAttributes(n, path, visitor);
-					n->VisitReferences(n, path, visitor);
+					n->VisitAttributes(n, path, visitor, recursive);
+					n->VisitReferences(n, path, visitor, recursive);
 					if(length > 1)
 					{
 						visitor->action(NULL, CLOSEBRACKETCOLON, NULL);
@@ -416,15 +434,29 @@ void Instance_VisitPathReferences(void *const this, char *parent, Visitor *visit
 	{
 		if(((Instance*)(this))->typeDefinition != NULL)
 		{
-			sprintf(path, "%s/typeDefinition[%s]", parent, ((Instance*)(this))->typeDefinition->InternalGetKey(((Instance*)(this))->typeDefinition));
-			((Instance*)(this))->typeDefinition->VisitPathAttributes(((Instance*)(this))->typeDefinition, path, visitor, recursive);
-			((Instance*)(this))->typeDefinition->VisitPathReferences(((Instance*)(this))->typeDefinition, path, visitor);
+			sprintf(path, "%s/typeDefinition[%s]", parent, ((Instance*)(this))->typeDefinition->internalGetKey(((Instance*)(this))->typeDefinition));
+			if (visitor->secondAction != NULL) {
+				if (visitor->secondAction(path, "typeDefinition")) {
+					((Instance*)(this))->typeDefinition->VisitPathAttributes(((Instance*)(this))->typeDefinition, path, visitor, recursive);
+					((Instance*)(this))->typeDefinition->VisitPathReferences(((Instance*)(this))->typeDefinition, path, visitor, recursive);
+				}
+			} else {
+				((Instance*)(this))->typeDefinition->VisitPathAttributes(((Instance*)(this))->typeDefinition, path, visitor, recursive);
+				((Instance*)(this))->typeDefinition->VisitPathReferences(((Instance*)(this))->typeDefinition, path, visitor, recursive);
+			}
 		}
 		if(((Instance*)(this))->dictionary != NULL)
 		{
-			sprintf(path, "%s/dictionary[%s]", parent, ((Instance*)(this))->dictionary->InternalGetKey(((Instance*)(this))->dictionary));
-			((Instance*)(this))->dictionary->VisitPathAttributes(((Instance*)(this))->dictionary, path, visitor);
-			((Instance*)(this))->dictionary->VisitPathReferences(((Instance*)(this))->dictionary, path, visitor);
+			sprintf(path, "%s/dictionary[%s]", parent, ((Instance*)(this))->dictionary->internalGetKey(((Instance*)(this))->dictionary));
+			if (visitor->secondAction != NULL) {
+				if (visitor->secondAction(path, "dictionary")) {
+					((Instance*)(this))->dictionary->VisitPathAttributes(((Instance*)(this))->dictionary, path, visitor, recursive);
+					((Instance*)(this))->dictionary->VisitPathReferences(((Instance*)(this))->dictionary, path, visitor, recursive);
+				} else {
+					((Instance*)(this))->dictionary->VisitPathAttributes(((Instance*)(this))->dictionary, path, visitor, recursive);
+					((Instance*)(this))->dictionary->VisitPathReferences(((Instance*)(this))->dictionary, path, visitor, recursive);
+				}
+			}
 		}
 
 		hashmap_map* m = NULL;
@@ -440,9 +472,16 @@ void Instance_VisitPathReferences(void *const this, char *parent, Visitor *visit
 				{
 					any_t data = (any_t) (m->data[i].data);
 					FragmentDictionary* n = data;
-					sprintf(path, "%s/fragmentDictionary[%s]", parent, n->InternalGetKey(n));
-					n->VisitPathAttributes(n, path, visitor);
-					n->VisitPathReferences(n, path, visitor);
+					sprintf(path, "%s/fragmentDictionary[%s]", parent, n->internalGetKey(n));
+					if (visitor->secondAction != NULL) {
+						if (visitor->secondAction(path, "fragmentDictionary")) {
+							n->VisitPathAttributes(n, path, visitor, recursive);
+							n->VisitPathReferences(n, path, visitor, recursive);
+						}
+					} else {
+						n->VisitPathAttributes(n, path, visitor, recursive);
+						n->VisitPathReferences(n, path, visitor, recursive);
+					}
 				}
 			}
 		}
@@ -451,14 +490,22 @@ void Instance_VisitPathReferences(void *const this, char *parent, Visitor *visit
 	{
 		if(((Instance*)(this))->typeDefinition != NULL)
 		{
-			sprintf(path, "%s/typeDefinition[%s]", parent, ((Instance*)(this))->typeDefinition->InternalGetKey(((Instance*)(this))->typeDefinition));
-			((Instance*)(this))->typeDefinition->VisitPathAttributes(((Instance*)(this))->typeDefinition, path, visitor, recursive);
+			sprintf(path, "%s/%s\\typeDefinition", parent, ((Instance*)(this))->typeDefinition->path);
+			/*((Instance*)(this))->typeDefinition->VisitPathAttributes(((Instance*)(this))->typeDefinition, path, visitor, recursive);*/
+			visitor->action(path, REFERENCE, parent);
 		}
 		if(((Instance*)(this))->dictionary != NULL)
 		{
-			sprintf(path, "%s/dictionary[%s]", parent, ((Instance*)(this))->dictionary->InternalGetKey(((Instance*)(this))->dictionary));
-			((Instance*)(this))->dictionary->VisitPathAttributes(((Instance*)(this))->dictionary, path, visitor);
-			((Instance*)(this))->dictionary->VisitPathReferences(((Instance*)(this))->dictionary, path, visitor);
+			sprintf(path, "%s/dictionary[%s]", parent, ((Instance*)(this))->dictionary->internalGetKey(((Instance*)(this))->dictionary));
+			if (visitor->secondAction != NULL) {
+				if (visitor->secondAction(path, "dictionary")) {
+					((Instance*)(this))->dictionary->VisitPathAttributes(((Instance*)(this))->dictionary, path, visitor, true);
+					((Instance*)(this))->dictionary->VisitPathReferences(((Instance*)(this))->dictionary, path, visitor, true);
+				} else {
+					((Instance*)(this))->dictionary->VisitPathAttributes(((Instance*)(this))->dictionary, path, visitor, true);
+					((Instance*)(this))->dictionary->VisitPathReferences(((Instance*)(this))->dictionary, path, visitor, true);
+				}
+			}
 		}
 
 		hashmap_map* m = NULL;
@@ -473,30 +520,38 @@ void Instance_VisitPathReferences(void *const this, char *parent, Visitor *visit
 				{
 					any_t data = (any_t) (m->data[i].data);
 					FragmentDictionary* n = data;
-					sprintf(path, "%s/fragmentDictionary[%s]", parent, n->InternalGetKey(n));
-					n->VisitPathAttributes(n, path, visitor);
-					n->VisitPathReferences(n, path, visitor);
+					sprintf(path, "%s/fragmentDictionary[%s]", parent, n->internalGetKey(n));
+					if (visitor->secondAction != NULL) {
+						if (visitor->secondAction(path, "fragmentDictionary")) {
+							n->VisitPathAttributes(n, path, visitor, true);
+							n->VisitPathReferences(n, path, visitor, true);
+						}
+					} else {
+						n->VisitPathAttributes(n, path, visitor, true);
+						n->VisitPathReferences(n, path, visitor, true);
+					}
 				}
 			}
 		}
 	}
 }
 
-void* Instance_FindByPath(char* attribute, Instance* const this)
+void* Instance_FindByPath(char* attribute, void* const this)
 {
+	Instance *pObj = (Instance*)this;
 	/* NamedElement attributes */
 	if(!strcmp("name", attribute))
 	{
-		return this->super->FindByPath(attribute, this->super);
+		return pObj->super->FindByPath(attribute, pObj->super);
 	}
 	/* Local attributes */
 	else if(!strcmp("metaData",attribute))
 	{
-		return this->metaData;
+		return pObj->metaData;
 	}
 	else if(!strcmp("started",attribute))
 	{
-		return (void*)this->started;
+		return (void*)pObj->started;
 	}
 	/* Local references */
 	else
@@ -544,29 +599,48 @@ void* Instance_FindByPath(char* attribute, Instance* const this)
 			}
 			else
 			{
-				nextAttribute = strtok(NULL, "\\");
-				strcpy(nextPath, ++nextAttribute);
-				PRINTF("Next Path: %s\n", nextPath);
-				nextAttribute = NULL;
+				nextAttribute = strtok(path, "]");
+				bool isFirst = true;
+				char *fragPath = NULL;
+				while ((fragPath = strtok(NULL, "]")) != NULL) {
+					PRINTF("Attribute: %s]\n", fragPath);
+					if (isFirst) {
+						sprintf(nextPath, "%s]", ++fragPath);
+						isFirst = false;
+					} else {
+						sprintf(nextPath, "%s/%s]", nextPath, ++fragPath);
+					}
+					PRINTF("Next Path: %s\n", nextPath);
+				}
+				if (strlen(nextPath) == 0) {
+					PRINTF("Attribute: NULL\n");
+					PRINTF("Next Path: NULL\n");
+					nextAttribute = NULL;
+				}
 			}
 		}
 		else
 		{
-			nextAttribute = strtok(path, "\\");
-			nextAttribute = strtok(NULL, "\\");
-			PRINTF("Attribute: %s\n", nextAttribute);
+			if ((nextAttribute = strtok(path, "\\")) != NULL) {
+				if ((nextAttribute = strtok(NULL, "\\")) != NULL) {
+					PRINTF("Attribute: %s\n", nextAttribute);
+				} else {
+					nextAttribute = strtok(path, "\\");
+					PRINTF("Attribute: %s\n", nextAttribute);
+				}
+			}
 		}
 
-		if(!strcmp("typeDefinition", obj))
+		if(!strcmp("typeDefinitions", obj))
 		{
 			free(obj);
 			if(nextAttribute == NULL)
 			{
-				return this->typeDefinition;
+				return pObj->typeDefinition;
 			}
 			else
 			{
-				return this->typeDefinition->FindByPath(nextPath, this->typeDefinition);
+				return pObj->typeDefinition->FindByPath(nextPath, pObj->typeDefinition);
 			}
 		}
 		else if(!strcmp("dictionary", obj))
@@ -574,11 +648,11 @@ void* Instance_FindByPath(char* attribute, Instance* const this)
 			free(obj);
 			if(nextAttribute == NULL)
 			{
-				return this->dictionary;
+				return pObj->dictionary;
 			}
 			else
 			{
-				return this->dictionary->FindByPath(nextPath, this->dictionary);
+				return pObj->dictionary->FindByPath(nextPath, pObj->dictionary);
 			}
 		}
 		else if(!strcmp("fragmentDictionary", obj))
@@ -586,11 +660,11 @@ void* Instance_FindByPath(char* attribute, Instance* const this)
 			free(obj);
 			if(nextAttribute == NULL)
 			{
-				return this->fragmentDictionary;
+				return pObj->FindFragmentDictionaryByID(pObj, key);
 			}
 			else
 			{
-				FragmentDictionary* value = this->FindFragmentDictionaryByID(this, key);
+				FragmentDictionary* value = pObj->FindFragmentDictionaryByID(pObj, key);
 				if(value != NULL)
 					return value->FindByPath(nextPath, value);
 				else

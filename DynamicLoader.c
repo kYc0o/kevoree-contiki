@@ -105,7 +105,7 @@ bool IDynamicLoader_register_instance(IDynamicLoader * const this, Instance *i)
 		printf("ERROR: architecture cannot be retrieved!\n");
 		return false;
 	} else {
-		if((internalGetKey = du->InternalGetKey(du)) == NULL) {
+		if((internalGetKey = du->internalGetKey(du)) == NULL) {
 			printf("ERROR: not enough memory for internalGetKey\n");
 			return false;
 		}
@@ -141,14 +141,14 @@ bool IDynamicLoader_register_instance(IDynamicLoader * const this, Instance *i)
 				printf("WARNING: reference already exists, overwriting to 1\n");
 				*pCurRef = 1;
 			} else {
-				if(hashmap_put(dynLoad->references, du->InternalGetKey(du), (void**)(&pRef)) == MAP_OK) {
+				if(hashmap_put(dynLoad->references, du->internalGetKey(du), (void**)(&pRef)) == MAP_OK) {
 					printf("INFO: reference has been added!\n");
 				}
 			}
 		} else {
 			dynLoad->references = hashmap_new();
 			if(dynLoad->references != NULL) {
-				if(hashmap_put(dynLoad->references, du->InternalGetKey(du), (void**)(&pRef)) == MAP_OK) {
+				if(hashmap_put(dynLoad->references, du->internalGetKey(du), (void**)(&pRef)) == MAP_OK) {
 					printf("INFO: reference has been added!\n");
 				}
 			}
@@ -172,7 +172,7 @@ bool IDynamicLoader_register_instance(IDynamicLoader * const this, Instance *i)
 					if(!strcmp(elfloader_autostart_processes[j]->name, internalGetKey)) {
 						process_start(elfloader_autostart_processes[j], NULL);
 						if(dynLoad->deployUnits != NULL) {
-							if((err = hashmap_put(dynLoad->deployUnits, du->InternalGetKey(du), (void**)(&elfloader_autostart_processes[j]))) == MAP_OK) {
+							if((err = hashmap_put(dynLoad->deployUnits, du->internalGetKey(du), (void**)(&elfloader_autostart_processes[j]))) == MAP_OK) {
 								printf("INFO: DeployUnit %s is installed!\n", internalGetKey);
 								free(internalGetKey);
 								return true;
@@ -184,7 +184,7 @@ bool IDynamicLoader_register_instance(IDynamicLoader * const this, Instance *i)
 						} else {
 							dynLoad->deployUnits = hashmap_new();
 							if(dynLoad->deployUnits != NULL) {
-								if((err = hashmap_put(dynLoad->deployUnits, du->InternalGetKey(du), (void**)(&elfloader_autostart_processes[j]))) == MAP_OK) {
+								if((err = hashmap_put(dynLoad->deployUnits, du->internalGetKey(du), (void**)(&elfloader_autostart_processes[j]))) == MAP_OK) {
 									printf("INFO: DeployUnit %s is installed!\n", internalGetKey);
 									free(internalGetKey);
 									return true;
@@ -249,7 +249,7 @@ AbstractTypeDefinition *IDynamicLoader_create_instance(IDynamicLoader * const th
 		printf("ERROR: architecture cannot be retrieved!\n");
 		return false;
 	} else {
-		if((internalGetKey = du->InternalGetKey(du)) == NULL) {
+		if((internalGetKey = du->internalGetKey(du)) == NULL) {
 			printf("ERROR: not enough memory for internalGetKey\n");
 			return NULL;
 		}
@@ -333,7 +333,7 @@ bool IDynamicLoader_destroy_instance(IDynamicLoader * const this, Instance *i)
 				printf("ERROR: architecture cannot be retrieved\n");
 				return false;
 			} else {
-				if((internalGetKey = du->InternalGetKey(du)) == NULL) {
+				if((internalGetKey = du->internalGetKey(du)) == NULL) {
 					printf("ERROR: not enough memory for internalGetKey\n");
 					return false;
 				}
