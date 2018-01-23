@@ -37,7 +37,7 @@ void delete_ModelTrace(void* const this)
 	}
 }
 
-char* ModelTrace_ToString(void* const this)
+char *ModelTrace_ToString(void* const this)
 {
   
 }

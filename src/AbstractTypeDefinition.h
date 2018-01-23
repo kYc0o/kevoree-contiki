@@ -23,17 +23,17 @@ typedef void (*fptrUpdateParam)(AbstractTypeDefinition*, char*, char*);
 
 typedef struct _AbstractTypeDefinition {
 	void *pDerivedObj;
-	KevoreeModelHandlerService *service;
-	Bootstraper *bootstrapService;
+	/*KevoreeModelHandlerService *service;
+	Bootstraper *bootstrapService;*/
 	char *path;
 	map_t params;
 	fptrStart start;
 	fptrStop stop;
 	fptrUpdate update;
-	fptrSetModelService setModelService;
+	/*fptrSetModelService setModelService;
 	fptrGetModelService getModelService;
 	fptrSetBootStrapperService setBootStrapperService;
-	fptrGetBootStrapperService getBootStrapperService;
+	fptrGetBootStrapperService getBootStrapperService;*/
 	fptrSetPath setPath;
 	fptrGetModelElement getModelElement;
 	fptrUpdateParam updateParam;
@@ -45,12 +45,12 @@ void delete_AbstractTypeDefinition(AbstractTypeDefinition *const this);
 void AbstractTypeDefinition_start(AbstractTypeDefinition *const this);
 void AbstractTypeDefinition_stop(AbstractTypeDefinition *const this);
 void AbstractTypeDefinition_update(AbstractTypeDefinition *const this);
-void AbstractTypeDefinition_setModelService(AbstractTypeDefinition *const this, KevoreeModelHandlerService *handler);
+/*void AbstractTypeDefinition_setModelService(AbstractTypeDefinition *const this, KevoreeModelHandlerService *handler);
 KevoreeModelHandlerService *AbstractTypeDefinition_getModelService(AbstractTypeDefinition *const this);
 void AbstractTypeDefinition_setBootStrapperService(AbstractTypeDefinition *const this, Bootstraper *bootstrapService);
-Bootstraper *AbstractTypeDefinition_getBootStrapperService(AbstractTypeDefinition *const this);
+Bootstraper *AbstractTypeDefinition_getBootStrapperService(AbstractTypeDefinition *const this);*/
 void AbstractTypeDefinition_setPath(AbstractTypeDefinition *const this, char *path);
-KMFContainer *AbstractTypeDefinition_getModelElement(AbstractTypeDefinition *const this);
+/*KMFContainer *AbstractTypeDefinition_getModelElement(AbstractTypeDefinition *const this);*/
 void AbstractTypeDefinition_updateParam(AbstractTypeDefinition *const this, char *key, char *value);
 
 #endif
